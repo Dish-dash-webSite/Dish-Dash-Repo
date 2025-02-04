@@ -11,6 +11,7 @@ const OrderItem = require('./models/OrderItem')(connection, DataTypes);
 const Review = require('./models/Review')(connection, DataTypes);
 const Category = require('./models/Category')(connection, DataTypes);
 const ReviewFood = require('./models/ReviewFood')(connection, DataTypes);
+const GeoLocation = require('./models/GeoLocation')(connection, DataTypes);
 
 
 // User Associations
@@ -22,16 +23,19 @@ User.hasOne(Driver, { foreignKey: 'userId' });
 Customer.belongsTo(User, { foreignKey: 'userId' });
 Customer.hasMany(Order, { foreignKey: 'customerId' });
 Customer.hasMany(Review, { foreignKey: 'customerId' });
+Customer.hasMany(GeoLocation, { foreignKey: 'customerId' })
 
 // Restaurant Associations
 Restaurant.belongsTo(User, { foreignKey: 'userId' });
 Restaurant.hasMany(MenuItem, { foreignKey: 'restaurantId' });
 Restaurant.hasMany(Order, { foreignKey: 'restaurantId' });
 Restaurant.hasMany(Review, { foreignKey: 'restaurantId' });
+Restaurant.hasOne(GeoLocation, { foreignKey: 'restaurantId' });
 
 // Driver Associations
 Driver.belongsTo(User, { foreignKey: 'userId' });
 Driver.hasMany(Order, { foreignKey: 'driverId' });
+Driver.hasMany(GeoLocation, { foreignKey: 'driverId' });
 
 // MenuItem Associations
 MenuItem.belongsTo(Restaurant, { foreignKey: 'restaurantId' });

@@ -1,6 +1,7 @@
-// In your models/index.js or a similar file
-const {DataTypes} = require('sequelize');
+const { DataTypes } = require('sequelize');
 const { connection } = require("./connection");
+
+// Import models
 const User = require('./models/User')(connection, DataTypes);
 const Customer = require('./models/Customer')(connection, DataTypes);
 const Restaurant = require('./models/Restaurant')(connection, DataTypes);
@@ -8,11 +9,9 @@ const Driver = require('./models/Driver')(connection, DataTypes);
 const MenuItem = require('./models/MenuItem')(connection, DataTypes);
 const Order = require('./models/Order')(connection, DataTypes);
 const OrderItem = require('./models/OrderItem')(connection, DataTypes);
-const Review = require('./models/Review')(connection, DataTypes);
 const Category = require('./models/Category')(connection, DataTypes);
-const ReviewFood = require('./models/ReviewFood')(connection, DataTypes);
 const GeoLocation = require('./models/GeoLocation')(connection, DataTypes);
-
+const Media = require('./models/Media')(connection, DataTypes);
 
 // User Associations
 User.hasOne(Customer, { foreignKey: 'userId' });
@@ -22,14 +21,12 @@ User.hasOne(Driver, { foreignKey: 'userId' });
 // Customer Associations
 Customer.belongsTo(User, { foreignKey: 'userId' });
 Customer.hasMany(Order, { foreignKey: 'customerId' });
-Customer.hasMany(Review, { foreignKey: 'customerId' });
-Customer.hasMany(GeoLocation, { foreignKey: 'customerId' })
+Customer.hasMany(GeoLocation, { foreignKey: 'customerId' });
 
 // Restaurant Associations
 Restaurant.belongsTo(User, { foreignKey: 'userId' });
 Restaurant.hasMany(MenuItem, { foreignKey: 'restaurantId' });
 Restaurant.hasMany(Order, { foreignKey: 'restaurantId' });
-Restaurant.hasMany(Review, { foreignKey: 'restaurantId' });
 Restaurant.hasOne(GeoLocation, { foreignKey: 'restaurantId' });
 
 // Driver Associations
@@ -41,7 +38,6 @@ Driver.hasMany(GeoLocation, { foreignKey: 'driverId' });
 MenuItem.belongsTo(Restaurant, { foreignKey: 'restaurantId' });
 MenuItem.hasMany(OrderItem, { foreignKey: 'menuItemId' });
 MenuItem.belongsTo(Category, { foreignKey: 'categoryId' });
-MenuItem.hasMany(ReviewFood, { foreignKey: 'menuItemId' }); 
 
 // Order Associations
 Order.belongsTo(Customer, { foreignKey: 'customerId' });
@@ -53,18 +49,20 @@ Order.hasMany(OrderItem, { foreignKey: 'orderId' });
 OrderItem.belongsTo(Order, { foreignKey: 'orderId' });
 OrderItem.belongsTo(MenuItem, { foreignKey: 'menuItemId' });
 
-// Review Associations
-Review.belongsTo(Customer, { foreignKey: 'customerId' });
-Review.belongsTo(Restaurant, { foreignKey: 'restaurantId' });
-
-// ReviewFood Associations
-ReviewFood.belongsTo(MenuItem, { foreignKey: 'menuItemId' });
-
 // Category Associations
-Category.hasMany(MenuItem, { foreignKey: 'categoryId' }); 
+Category.hasMany(MenuItem, { foreignKey: 'categoryId' });
 
-// :
+// Media Associations
+Media.belongsTo(User, { foreignKey: 'userId' });
+Media.belongsTo(Restaurant, { foreignKey: 'restaurantId' });
+Media.belongsTo(Driver, { foreignKey: 'driverId' });
+Media.belongsTo(Customer, { foreignKey: 'customerId' });
+Media.belongsTo(OrderItem, { foreignKey: 'orderItemId' });
 
+// Sync all models with the database
+connection.sync({ alter: true });
+
+// Export all models
 module.exports = {
   User,
   Customer,
@@ -73,5 +71,7 @@ module.exports = {
   MenuItem,
   Order,
   OrderItem,
-  Review,
+  Category,
+  GeoLocation,
+  Media,
 };

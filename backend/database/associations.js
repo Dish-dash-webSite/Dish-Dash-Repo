@@ -11,7 +11,7 @@ const Order = require('./models/Order')(connection, DataTypes);
 const OrderItem = require('./models/OrderItem')(connection, DataTypes);
 const Category = require('./models/Category')(connection, DataTypes);
 const GeoLocation = require('./models/GeoLocation')(connection, DataTypes);
-const Media = require('./models/Media')(connection, DataTypes);
+const Media = require('./models/media')(connection, DataTypes);
 
 // User Associations
 User.hasOne(Customer, { foreignKey: 'userId' });

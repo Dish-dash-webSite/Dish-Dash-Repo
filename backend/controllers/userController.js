@@ -42,10 +42,10 @@ exports.register = [
                 userId: user.id
             });
 
-            res.status(201).json({ 
-                message: 'User registered successfully', 
+            res.status(201).json({
+                message: 'User registered successfully',
                 user,
-                customer 
+                customer
             });
         } catch (error) {
             res.status(500).json({ message: 'Internal server error', error });

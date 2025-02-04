@@ -60,7 +60,7 @@ Media.belongsTo(Customer, { foreignKey: 'customerId' });
 Media.belongsTo(OrderItem, { foreignKey: 'orderItemId' });
 
 // Sync all models with the database
-connection.sync({ alter: true });
+// connection.sync({ alter: true });
 
 // Export all models
 module.exports = {

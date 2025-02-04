@@ -11,14 +11,22 @@ const adminRoutes = require("./routes/adminRoutes");
 
 const app = express();
 
+const userRoutes = require('./routes/userRoutes');
+
+app.use(cors());
+app.use(express.json()); 
+app.use(express.urlencoded({ extended: true })); 
+
+// Use user routes
+app.use('/api/users', userRoutes);
 // Middleware
-app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
-  credentials: true // Enable credentials (cookies)
-}));
+// app.use(cors({
+//   origin: process.env.CLIENT_URL || 'http://localhost:3000',
+//   credentials: true // Enable credentials (cookies)
+// }));
 app.use(cookieParser()); // Add cookie parser
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+
+
 
 // Routes
 app.use('/api/admin', adminRoutes);

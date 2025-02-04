@@ -1,22 +1,22 @@
-
 const { Sequelize } = require('sequelize');
+const dotenv = require('dotenv');
+dotenv.config();
+
+ // Debugging: Ensure it's loaded
 
 
-const DB_NAME = process.env.DB_NAME ;
-const DB_USER = process.env.DB_USER ;
-const DB_PASSWORD = process.env.DB_PASSWORD ;
-const DB_HOST = process.env.DB_HOST ;
-const DB_DIALECT = process.env.DB_DIALECT ; 
+const DB_NAME = process.env.DB_NAME||"localhost";
+const DB_USER = process.env.DB_USER||"root";
+const DB_PASSWORD = process.env.DB_PASSWORD||"root";
+const DB_HOST = process.env.DB_HOST || "localhost";
+// const DB_DIALECT = "mysql";
 
+// console.log("DB_DIALECT:", DB_DIALECT); // Debugging: Log the DB_DIALECT
 
-
-console.log("DB_DIALECT:", process.env.DB_DIALECT); 
-
-
-
-const connection = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
-  host: DB_HOST,
-  dialect: DB_DIALECT,
+// Initialize Sequelize with the database credentials
+const connection = new Sequelize("dish_dash", "root", "root", {
+  host: "localhost",
+  dialect:"mysql", // Ensure this is a string like 'mysql'
   pool: {
     max: 10,
     min: 0,
@@ -25,6 +25,7 @@ const connection = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
   },
 });
 
+// Function to test the database connection
 const testConnection = async () => {
   try {
     await connection.authenticate();
@@ -34,6 +35,8 @@ const testConnection = async () => {
   }
 };
 
+// Test the connection
 testConnection();
 
+// Export the connection object for use in other parts of the application
 module.exports = { connection };

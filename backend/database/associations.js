@@ -1,6 +1,6 @@
 // In your models/index.js or a similar file
 const {DataTypes} = require('sequelize');
-const connection =require("./connection");
+const { connection } = require("./connection");
 const User = require('./models/User')(connection, DataTypes);
 const Customer = require('./models/Customer')(connection, DataTypes);
 const Restaurant = require('./models/Restaurant')(connection, DataTypes);
@@ -63,7 +63,7 @@ ReviewFood.belongsTo(MenuItem, { foreignKey: 'menuItemId' });
 // Category Associations
 Category.hasMany(MenuItem, { foreignKey: 'categoryId' }); 
 
-connection.sync({ force: true })
+// :
 
 module.exports = {
   User,

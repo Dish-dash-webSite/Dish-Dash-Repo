@@ -63,7 +63,7 @@ ReviewFood.belongsTo(MenuItem, { foreignKey: 'menuItemId' });
 // Category Associations
 Category.hasMany(MenuItem, { foreignKey: 'categoryId' }); 
 
-// connection.sync({ alter: true })
+connection.sync({ force: true })
 
 module.exports = {
   User,

@@ -14,8 +14,8 @@ const app = express();
 const userRoutes = require('./routes/userRoutes');
 
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json()); 
+app.use(express.urlencoded({ extended: true })); 
 
 // Use user routes
 app.use('/api/users', userRoutes);

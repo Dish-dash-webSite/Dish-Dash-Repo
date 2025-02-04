@@ -11,46 +11,52 @@ const Order = require('./models/Order')(connection, DataTypes);
 const OrderItem = require('./models/OrderItem')(connection, DataTypes);
 const Category = require('./models/Category')(connection, DataTypes);
 const GeoLocation = require('./models/GeoLocation')(connection, DataTypes);
-const Media = require('./models/Media')(connection, DataTypes);
+const Media = require('./models/media')(connection, DataTypes);
+const RestaurantOwner = require("./models/restaurantOwner")(connection, DataTypes);
 
 // User Associations
-User.hasOne(Customer, { foreignKey: 'userId' });
-User.hasOne(Restaurant, { foreignKey: 'userId' });
-User.hasOne(Driver, { foreignKey: 'userId' });
+User.hasOne(Customer, { foreignKey: 'userId', onDelete: 'CASCADE' });
+User.hasOne(RestaurantOwner, { foreignKey: 'userId', onDelete: 'CASCADE' });
+User.hasOne(Driver, { foreignKey: 'userId', onDelete: 'CASCADE' });
 
 // Customer Associations
 Customer.belongsTo(User, { foreignKey: 'userId' });
-Customer.hasMany(Order, { foreignKey: 'customerId' });
-Customer.hasMany(GeoLocation, { foreignKey: 'customerId' });
+Customer.hasMany(Order, { foreignKey: 'customerId', onDelete: 'CASCADE' });
+Customer.hasMany(GeoLocation, { foreignKey: 'customerId', onDelete: 'CASCADE' });
 
 // Restaurant Associations
-Restaurant.belongsTo(User, { foreignKey: 'userId' });
-Restaurant.hasMany(MenuItem, { foreignKey: 'restaurantId' });
-Restaurant.hasMany(Order, { foreignKey: 'restaurantId' });
-Restaurant.hasOne(GeoLocation, { foreignKey: 'restaurantId' });
+Restaurant.belongsTo(RestaurantOwner, { foreignKey: 'restaurantOwnerId' });
+Restaurant.hasMany(MenuItem, { foreignKey: 'restaurantId', onDelete: 'CASCADE' });
+Restaurant.hasMany(Order, { foreignKey: 'restaurantId', onDelete: 'CASCADE' });
+Restaurant.hasOne(GeoLocation, { foreignKey: 'restaurantId', onDelete: 'CASCADE' });
+
+
+// Restaurant Owner Associations
+RestaurantOwner.belongsTo(User, { foreignKey: 'userId' });
+RestaurantOwner.hasMany(Restaurant, { foreignKey: 'restaurantOwnerId', onDelete: 'CASCADE' });
 
 // Driver Associations
 Driver.belongsTo(User, { foreignKey: 'userId' });
-Driver.hasMany(Order, { foreignKey: 'driverId' });
-Driver.hasMany(GeoLocation, { foreignKey: 'driverId' });
+Driver.hasMany(Order, { foreignKey: 'driverId', onDelete: 'CASCADE' });
+Driver.hasMany(GeoLocation, { foreignKey: 'driverId', onDelete: 'CASCADE' });
 
 // MenuItem Associations
 MenuItem.belongsTo(Restaurant, { foreignKey: 'restaurantId' });
-MenuItem.hasMany(OrderItem, { foreignKey: 'menuItemId' });
+MenuItem.hasMany(OrderItem, { foreignKey: 'menuItemId', onDelete: 'CASCADE' });
 MenuItem.belongsTo(Category, { foreignKey: 'categoryId' });
 
 // Order Associations
 Order.belongsTo(Customer, { foreignKey: 'customerId' });
 Order.belongsTo(Restaurant, { foreignKey: 'restaurantId' });
 Order.belongsTo(Driver, { foreignKey: 'driverId' });
-Order.hasMany(OrderItem, { foreignKey: 'orderId' });
+Order.hasMany(OrderItem, { foreignKey: 'orderId', onDelete: 'CASCADE' });
 
 // OrderItem Associations
 OrderItem.belongsTo(Order, { foreignKey: 'orderId' });
 OrderItem.belongsTo(MenuItem, { foreignKey: 'menuItemId' });
 
 // Category Associations
-Category.hasMany(MenuItem, { foreignKey: 'categoryId' });
+Category.hasMany(MenuItem, { foreignKey: 'categoryId', onDelete: 'CASCADE' });;
 
 // Media Associations
 Media.belongsTo(User, { foreignKey: 'userId' });
@@ -60,7 +66,9 @@ Media.belongsTo(Customer, { foreignKey: 'customerId' });
 Media.belongsTo(OrderItem, { foreignKey: 'orderItemId' });
 
 // Sync all models with the database
-connection.sync({ alter: true });
+connection.sync({ force: true }).then(() => {
+  console.log('Database & tables created!');
+});
 
 // Export all models
 module.exports = {
@@ -74,4 +82,5 @@ module.exports = {
   Category,
   GeoLocation,
   Media,
+  RestaurantOwner,
 };

@@ -5,6 +5,7 @@ const cors = require("cors");
 const port = process.env.SERVER_PORT;
 const host = process.env.SERVER_HOST
 
+const db = require("./database/connection.js");
 const app = express();
 
 app.use(cors());

@@ -2,7 +2,22 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
-    }
-  }
+      "@/*": ["src/*"]
+    },
+    "jsx": "react-jsx",  // Use "react" if you are using an older version of React (before React 17)
+    "target": "esnext",  // Can be set to "es6" if you need broader compatibility
+    "module": "esnext",  // Or "es6" if necessary
+    "strict": true,      // Ensures stricter type checks
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",     // Exclude node_modules from being processed
+    "dist",             // Exclude output directories like dist
+    "build"             // Exclude build artifacts
+  ]
 }

@@ -13,8 +13,15 @@ const Category = require('./models/Category')(connection, DataTypes);
 const GeoLocation = require('./models/GeoLocation')(connection, DataTypes);
 const Media = require('./models/media')(connection, DataTypes);
 const RestaurantOwner = require("./models/restaurantOwner")(connection, DataTypes);
+const Conversation = require('./models/Conversation')(connection, DataTypes);
+const Message = require('./models/Message')(connection, DataTypes);
 
 // User Associations
+
+
+
+
+//user associations
 User.hasOne(Customer, { foreignKey: 'userId', onDelete: 'CASCADE' });
 User.hasOne(RestaurantOwner, { foreignKey: 'userId', onDelete: 'CASCADE' });
 User.hasOne(Driver, { foreignKey: 'userId', onDelete: 'CASCADE' });
@@ -23,6 +30,7 @@ User.hasOne(Driver, { foreignKey: 'userId', onDelete: 'CASCADE' });
 Customer.belongsTo(User, { foreignKey: 'userId' });
 Customer.hasMany(Order, { foreignKey: 'customerId', onDelete: 'CASCADE' });
 Customer.hasMany(GeoLocation, { foreignKey: 'customerId', onDelete: 'CASCADE' });
+Customer.hasMany(Conversation, { foreignKey: 'customerId', onDelete: 'CASCADE' });
 
 // Restaurant Associations
 Restaurant.belongsTo(RestaurantOwner, { foreignKey: 'restaurantOwnerId' });
@@ -39,6 +47,7 @@ RestaurantOwner.hasMany(Restaurant, { foreignKey: 'restaurantOwnerId', onDelete:
 Driver.belongsTo(User, { foreignKey: 'userId' });
 Driver.hasMany(Order, { foreignKey: 'driverId', onDelete: 'CASCADE' });
 Driver.hasMany(GeoLocation, { foreignKey: 'driverId', onDelete: 'CASCADE' });
+Driver.hasMany(Conversation, { foreignKey: 'driverId', onDelete: 'CASCADE' });
 
 // MenuItem Associations
 MenuItem.belongsTo(Restaurant, { foreignKey: 'restaurantId' });
@@ -69,6 +78,19 @@ Media.belongsTo(OrderItem, { foreignKey: 'orderItemId' });
 connection.sync({ force: true }).then(() => {
   console.log('Database & tables created!');
 });
+
+// Conversation Associations
+Conversation.belongsTo(Customer, { foreignKey: 'customerId' });
+Conversation.belongsTo(Driver, { foreignKey: 'driverId' });
+Conversation.hasMany(Message, { foreignKey: 'conversationId', onDelete: 'CASCADE' });
+
+// Message Associations
+Message.belongsTo(Conversation, { foreignKey: 'conversationId' });
+
+
+connection.sync({ force: true });
+
+
 
 // Export all models
 module.exports = {

@@ -5,7 +5,7 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const port = process.env.SERVER_PORT;
 const host = process.env.SERVER_HOST;
-console.log(host);
+const DriverRouter = require('./routes/driverRoutes'); 
 const db = require("./database/connection.js");
 const adminRoutes = require("./routes/adminRoutes");
 
@@ -30,6 +30,7 @@ app.use(cookieParser()); // Add cookie parser
 
 // Routes
 app.use('/api/admin', adminRoutes);
+app.use('/api/driver', DriverRouter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

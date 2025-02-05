@@ -3,14 +3,21 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../app/hooks';
 import { logoutThunk } from '../features/auth/authSlice';
 
+// Define the menu item type for better type safety
+interface MenuItem {
+    title: string;
+    path: string;
+}
+
 const Sidebar: React.FC = () => {
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState<boolean>(false); // Explicit type for state
     const location = useLocation();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
+    
     const isDashboard = location.pathname === '/dashboard';
 
-    const menuItems = [
+    const menuItems: MenuItem[] = [
         { title: 'Users', path: '/users' },
         { title: 'Deliveries', path: '/deliveries' },
         { title: 'Restaurants', path: '/restaurants' },
@@ -23,6 +30,7 @@ const Sidebar: React.FC = () => {
             await dispatch(logoutThunk()).unwrap();
             navigate('/login');
         } catch (error) {
+            // Optional: you could further type the error based on your API error responses
             console.error('Logout failed:', error);
         }
     };
@@ -95,4 +103,4 @@ const Sidebar: React.FC = () => {
     );
 };
 
-export default Sidebar; 
+export default Sidebar;

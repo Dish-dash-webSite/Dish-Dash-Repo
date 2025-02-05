@@ -3,7 +3,6 @@ const express = require("express");
 require("dotenv").config();
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const port = 3000;
 const RestoRoter = require("./routes/restaurantRoutes.js")
 const port = process.env.SERVER_PORT;
 const host = process.env.SERVER_HOST;

@@ -165,8 +165,18 @@ const adminController = {
                 message: 'Internal server error',
             });
         }
+    },
+    getAllRestaurant: async (req, res) => {
+        const { id } = req.params
+        try {
+            const restaurants = await restaurants.findAll({ where: { id } })
+            console.log("ress", restaurants)
+            res.status(200).send(restaurants)
+        } catch (err) {
+            console.log("err", err)
+            res.status(404).sent(err)
+        }
     }
-
 };
 
 module.exports = adminController; 

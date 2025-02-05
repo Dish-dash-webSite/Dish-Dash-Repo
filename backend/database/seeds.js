@@ -81,7 +81,7 @@ const {  User,
     try{
         const drivers = [
             {
-                userId: 1,
+              userId: 4, // Reference
                 firstName: 'Michael',
                 lastName: 'Scott',
                 vehicleType: 'Sedan',
@@ -89,24 +89,7 @@ const {  User,
                 createdAt: new Date(),
                 updatedAt: new Date()
               },
-              {
-                userId: 2,
-                firstName: 'Dwight',
-                lastName: 'Schrute',
-                vehicleType: 'Truck',
-                licenseNumber: 'XYZ5678',
-                createdAt: new Date(),
-                updatedAt: new Date()
-              },
-              {
-                userId: 3,
-                firstName: 'Jim',
-                lastName: 'Halpert',
-                vehicleType: 'SUV',
-                licenseNumber: 'LMN9101',
-                createdAt: new Date(),
-                updatedAt: new Date()
-              }];
+            ];
           await Driver.bulkCreate(drivers);
           console.log('seeded successfully!');
         } catch (error) {        
@@ -254,4 +237,3 @@ seedDriver()
 seedCategory()
 seedGeolocation()
 // seedMenuItem()
-// seedsRestaurant()

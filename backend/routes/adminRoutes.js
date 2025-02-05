@@ -7,7 +7,7 @@ const adminAuth = require('../middlewares/adminAuth');
 router.post('/login', adminController.login);
 
 // Protected routes
-router.post('/logout', adminAuth, adminController.logout);
+router.post('/logout', adminController.logout);
 
 // Admin registration route
 router.post('/register', adminController.register);

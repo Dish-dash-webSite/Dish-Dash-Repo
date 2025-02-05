@@ -1,4 +1,3 @@
-// server.js
 const express = require("express");
 require("dotenv").config();
 const cors = require("cors");
@@ -8,6 +7,7 @@ const host = process.env.SERVER_HOST;
 // const DriverRouter = require('./routes/driverRoutes'); 
 const db = require("./database/connection.js");
 const adminRoutes = require("./routes/adminRoutes");
+const userRoutes = require("./routes/userRoutes");
 
 const app = express();
 const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174'];
@@ -23,7 +23,7 @@ app.use(cors({
   credentials: true,  // If you're using cookies
 }));
 
-const userRoutes = require('./routes/userRoutes');
+
 
 // app.use(cors());
 
@@ -40,16 +40,35 @@ app.use(cookieParser()); // Add cookie parser
 // Routes
 app.use('/api/admin', adminRoutes);
 // app.use('/api/driver', DriverRouter);
+// ✅ Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
-// Error handling middleware
+// ✅ CORS Configuration for Cookies
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    credentials: true, // Enables cookies in requests
+    allowedHeaders: ["Content-Type", "Authorization"], // Ensure correct headers
+  })
+);
+
+// ✅ Routes
+app.use("/api/users", userRoutes);
+app.use("/api/admin", adminRoutes);
+
+// ✅ Error Handling Middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({
     success: false,
-    message: 'Internal Server Error'
+    message: "Internal Server Error",
   });
 });
 
+// ✅ Start Server
 app.listen(port, host, () => {
   console.log(`Server is running on http://${host}:${port}`);
 });
+

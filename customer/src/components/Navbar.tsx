@@ -1,16 +1,22 @@
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../store';
-import { logout } from '../store/slices/authSlice';
+import { RootState, AppDispatch } from '../store/index';
+import { logoutUser } from '../store/authThunks';
 import { MapPin, ShoppingBag, /*Search, */User, LogOut } from 'lucide-react';
 
+
+
+
+
 const Navbar = () => {
-  const dispatch = useDispatch();
-  const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
+  const dispatch = useDispatch<AppDispatch>();
+  const { user } = useSelector((state: RootState) => state.auth);
+
 
   const handleLogout = () => {
-    dispatch(logout());
+    dispatch(logoutUser());
   };
+
 
   return (
     <>
@@ -49,7 +55,7 @@ const Navbar = () => {
               <span className="ml-2">£0.00</span>
             </div>
             
-            {isAuthenticated ? (
+            {user ? (
               <div className="flex items-center space-x-4">
                 <span className="text-gray-600">Hello, {user?.name}</span>
                 <button

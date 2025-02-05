@@ -88,7 +88,7 @@ Conversation.hasMany(Message, { foreignKey: 'conversationId', onDelete: 'CASCADE
 Message.belongsTo(Conversation, { foreignKey: 'conversationId' });
 
 
-connection.sync({ force: true });
+// connection.sync({ force: true });
 
 
 

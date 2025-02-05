@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET || '1234';
 const expiresIn = '10h';
 const saltRounds = 10;
+const validator = require('validator'); 
 
 const register = async (req, res) => {
     try {
@@ -15,6 +16,24 @@ const register = async (req, res) => {
         if (!firstName || !lastName || !email || !password || !phoneNumber || !vehicleType || !role || !licenseNumber || !deliveryAddress) {
             return res.status(400).json({ error: "All fields are required" });
         }
+
+        if (!validator.isEmail(email)) {
+            return res.status(400).json({ error: "Invalid email format" });
+        }
+
+        // Validate phone number (e.g., ensure it's a valid mobile number)
+        if (!validator.isMobilePhone(phoneNumber, 'any', { strictMode: false })) {
+            return res.status(400).json({ error: "Invalid phone number" });
+        }
+
+        // Validate password length (example: at least 8 characters)
+        const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+        if (!passwordRegex.test(password)) {
+            return res.status(400).json({
+                error: "Password must be at least 8 characters long, include at least one uppercase letter, and one special character."
+            });
+        }
+
 
         const existingUser = await User.findOne({ where: { email } });
 
@@ -48,7 +67,7 @@ const register = async (req, res) => {
             }).json({ message: "Register successful", login: "Login successful" });
         } else {
             const hashedPassword = await bcrypt.hash(password, saltRounds);
-            const newUser = await User.create({ email, password: hashedPassword, phoneNumber, role });
+            const newUser = await User.create({ email, passwordHash: hashedPassword, phoneNumber, role });
 
             const newDriver = await Driver.create({ firstName, lastName, vehicleType, licenseNumber, userId: newUser.id });
             const newCustomer = await Customer.create({ firstName, lastName, deliveryAddress, userId: newUser.id });

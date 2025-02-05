@@ -1,7 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
-import App from './AllPages/index';
+import App from './AllPages';
 
 // Ensure that the 'root' element exists, otherwise, handle the case when it's null
 const rootElement = document.getElementById('root');

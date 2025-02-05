@@ -74,10 +74,6 @@ Media.belongsTo(Driver, { foreignKey: 'driverId' });
 Media.belongsTo(Customer, { foreignKey: 'customerId' });
 Media.belongsTo(OrderItem, { foreignKey: 'orderItemId' });
 
-// Sync all models with the database
-// connection.sync({ force: true }).then(() => {
-//   console.log('Database & tables created!');
-// });
 
 // Conversation Associations
 Conversation.belongsTo(Customer, { foreignKey: 'customerId' });
@@ -87,12 +83,12 @@ Conversation.hasMany(Message, { foreignKey: 'conversationId', onDelete: 'CASCADE
 // Message Associations
 Message.belongsTo(Conversation, { foreignKey: 'conversationId' });
 
+// Sync all models with the database
+// connection.sync({ force: true }).then(() => {
+//   console.log('Database & tables created!');
+// });
 
-// connection.sync({ force: true });
 
-
-
-// Export all models
 module.exports = {
   User,
   Customer,

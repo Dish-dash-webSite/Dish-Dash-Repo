@@ -2,14 +2,20 @@
 // import OwnerRestaurantPages from './AllPages/OwnerRestaurantPages';
 // import DeliveryPages from './AllPages/DeliveryPages';
 // import ClientPages from './AllPages/ClientPages';
-
-import AllPages from './AllPages';
-
-function App() {
+import {Button} from "./components/ui/button"
+function App():any {
   return (
-    <div className="App">
-      {/* ... other components ... */}
-      <AllPages />
+    // <Router>
+    //   <Routes>
+    //     <Route path="/owner/*" element={<OwnerRestaurantPages />} />
+    //     <Route path="/delivery/*" element={<DeliveryPages />} />
+    //     <Route path="/client/*" element={<ClientPages />} />
+    //   </Routes>
+    // </Router>7
+    // <btn/>
+    <div>Hello World
+
+        <Button>Click me</Button>
     </div>
   );
 }

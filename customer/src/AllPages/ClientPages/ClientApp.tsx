@@ -1,9 +1,12 @@
-const ClientApp = () => {
+import { Routes, Route } from "react-router-dom";
+import Homepage from "./pages/Homepage"
+
+const ClientApp: React.FC = () => {
   return (
-    <div className="client-app">
-      <h1>Client Dashboard</h1>
-      <p>Welcome to the client section!</p>
-    </div>
+    <Routes>
+           <Route path="/" element={<Homepage />} />
+
+    </Routes>
   );
 };
 

@@ -1,23 +1,15 @@
-// import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-// import OwnerRestaurantPages from './AllPages/OwnerRestaurantPages';
-// import DeliveryPages from './AllPages/DeliveryPages';
-// import ClientPages from './AllPages/ClientPages';
-import {Button} from "./components/ui/button"
-function App():any {
-  return (
-    // <Router>
-    //   <Routes>
-    //     <Route path="/owner/*" element={<OwnerRestaurantPages />} />
-    //     <Route path="/delivery/*" element={<DeliveryPages />} />
-    //     <Route path="/client/*" element={<ClientPages />} />
-    //   </Routes>
-    // </Router>7
-    // <btn/>
-    <div>Hello World
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Delivery from "./AllPages/DeliveryPages/Delivery";
 
-        <Button>Click me</Button>
-    </div>
+const App: React.FC = () => {
+  return (
+    <Router>
+      <Routes>
+        <Route path="delivery/*" element={<Delivery />} />
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;

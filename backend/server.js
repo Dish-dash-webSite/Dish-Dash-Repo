@@ -5,7 +5,7 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const port = process.env.SERVER_PORT;
 const host = process.env.SERVER_HOST;
-
+console.log(host);
 const db = require("./database/connection.js");
 const adminRoutes = require("./routes/adminRoutes");
 

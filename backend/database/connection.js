@@ -1,11 +1,10 @@
 const { Sequelize } = require('sequelize');
 const dotenv = require('dotenv');
 dotenv.config();
-
  // Debugging: Ensure it's loaded
 
 
-const DB_NAME = process.env.DB_NAME||"localhost";
+const DB_NAME = process.env.DB_NAME;
 const DB_USER = process.env.DB_USER||"root";
 const DB_PASSWORD = process.env.DB_PASSWORD||"root";
 const DB_HOST = process.env.DB_HOST || "localhost";

@@ -1,23 +1,23 @@
-// import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-// import OwnerRestaurantPages from './AllPages/OwnerRestaurantPages';
-// import DeliveryPages from './AllPages/DeliveryPages';
-// import ClientPages from './AllPages/ClientPages';
-import {Button} from "./components/ui/button"
-function App():any {
-  return (
-    // <Router>
-    //   <Routes>
-    //     <Route path="/owner/*" element={<OwnerRestaurantPages />} />
-    //     <Route path="/delivery/*" element={<DeliveryPages />} />
-    //     <Route path="/client/*" element={<ClientPages />} />
-    //   </Routes>
-    // </Router>7
-    // <btn/>
-    <div>Hello World
+import { BrowserRouter as Router } from "react-router-dom";
+import { Provider } from "react-redux"; // ✅ Import Provider
+import { store } from "./store"; // ✅ Import Redux store
+import Navbar from "./components/Navbar";
+import AllPages from "./AllPages";
+import Footer from "./components/Footer";
 
-        <Button>Click me</Button>
-    </div>
+function App() {
+  return (
+    <Provider store={store}> {/* ✅ Wrap Redux Provider */}
+      <Router>
+        <div className="App">
+          <Navbar />
+          <Footer />
+          <AllPages />
+        </div>
+      </Router>
+    </Provider>
   );
 }
 
 export default App;
+

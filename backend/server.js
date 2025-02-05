@@ -10,20 +10,20 @@ const db = require("./database/connection.js");
 const adminRoutes = require("./routes/adminRoutes");
 
 const app = express();
-
+app.use(cors({
+  origin: "http://localhost:5173"|| 'http://localhost:3000',
+  credentials: true // Enable credentials (cookies)
+}));
 const userRoutes = require('./routes/userRoutes');
 
-app.use(cors());
+// app.use(cors());
+
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true })); 
 
 // Use user routes
 app.use('/api/users', userRoutes);
-// Middleware
-// app.use(cors({
-//   origin: process.env.CLIENT_URL || 'http://localhost:3000',
-//   credentials: true // Enable credentials (cookies)
-// }));
+
 app.use(cookieParser()); // Add cookie parser
 
 

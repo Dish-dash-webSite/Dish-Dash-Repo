@@ -81,7 +81,6 @@ const {  User,
     try{
         const drivers = [
             {
-                userId: 1,
                 firstName: 'Michael',
                 lastName: 'Scott',
                 vehicleType: 'Sedan',
@@ -90,7 +89,6 @@ const {  User,
                 updatedAt: new Date()
               },
               {
-                userId: 2,
                 firstName: 'Dwight',
                 lastName: 'Schrute',
                 vehicleType: 'Truck',
@@ -99,7 +97,6 @@ const {  User,
                 updatedAt: new Date()
               },
               {
-                userId: 3,
                 firstName: 'Jim',
                 lastName: 'Halpert',
                 vehicleType: 'SUV',
@@ -156,7 +153,7 @@ const menuItems=[
         isAvailable: true,
     },
     {
-        restaurantId: 2, // Reference to a restaurant's id (Assuming restaurant with id 2 exists)
+        restaurantId: 1, // Reference to a restaurant's id (Assuming restaurant with id 2 exists)
         name: 'Margherita Pizza',
         description: 'Fresh mozzarella, tomatoes, and basil, on a crispy crust.',
         price: 10.49,
@@ -164,7 +161,7 @@ const menuItems=[
         isAvailable: true,
     },
     {
-        restaurantId: 3, // Reference to a restaurant's id (Assuming restaurant with id 3 exists)
+        restaurantId: 1, // Reference to a restaurant's id (Assuming restaurant with id 3 exists)
         name: 'Caesar Salad',
         description: 'Crisp lettuce, parmesan, croutons, and Caesar dressing.',
         price: 8.99,
@@ -180,7 +177,7 @@ const menuItems=[
         isAvailable: true,
     },
     {
-        restaurantId: 2, // Reference to a restaurant's id
+        restaurantId: 1, // Reference to a restaurant's id
         name: 'Garlic Bread',
         description: 'Warm bread with a garlic butter spread, toasted to perfection.',
         price: 4.99,
@@ -248,10 +245,10 @@ const menuItems=[
   } 
   
 
-// seedUser()
-// seedCustomer()
-// seedDriver()
-// seedCategory()
-// seedGeolocation()
-// seedMenuItem()
+seedUser()
 // seedsRestaurant()
+seedCustomer()
+// seedDriver()
+seedCategory()
+seedGeolocation()
+// seedMenuItem()

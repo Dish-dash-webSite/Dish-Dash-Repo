@@ -8,6 +8,8 @@ const host = process.env.SERVER_HOST;
 const db = require("./database/connection.js");
 const adminRoutes = require("./routes/adminRoutes");
 const userRoutes = require("./routes/userRoutes");
+const restaurantRoutes = require('./routes/restaurantRoutes')
+
 
 const app = express();
 const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174'];
@@ -57,6 +59,7 @@ app.use(
 // ✅ Routes
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
+app.use('/api/restaurants', restaurantRoutes)
 
 // ✅ Error Handling Middleware
 app.use((err, req, res, next) => {

@@ -139,7 +139,7 @@ const adminController = {
                 "1234",
                 { expiresIn: '7d' }
             );
-
+            console.log("this is your token", token)
             // Set token in cookie
             res.cookie('RestToken', token, {
                 httpOnly: true,

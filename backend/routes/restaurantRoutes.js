@@ -1,15 +1,15 @@
 const express = require('express');
 const routerResto = express.Router();
 const RestoController = require('../controllers/restaurantController');
-const adminAuth = require('../middlewares/adminAuth');
+const validateLogin = require('../middlewares/restoOwner');
 
 // Public routes
-routerResto.post('/login', RestoController.login);
+routerResto.post('/login', validateLogin, RestoController.login);
 
 // Protected routes
-routerResto.post('/logout', adminAuth, RestoController.logout);
+// routerResto.post('/logout', logout);
 
 // Admin registration route
 routerResto.post('/register', RestoController.register);
 
-module.exports = router; 
+module.exports = routerResto; 

@@ -3,9 +3,10 @@ const express = require("express");
 require("dotenv").config();
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const RestoRoter = require("./routes/restaurantRoutes.js")
 const port = process.env.SERVER_PORT;
 const host = process.env.SERVER_HOST;
-const DriverRouter = require('./routes/driverRoutes'); 
+// const DriverRouter = require('./routes/driverRoutes'); 
 const db = require("./database/connection.js");
 const adminRoutes = require("./routes/adminRoutes");
 
@@ -14,11 +15,12 @@ const app = express();
 const userRoutes = require('./routes/userRoutes');
 
 app.use(cors());
-app.use(express.json()); 
-app.use(express.urlencoded({ extended: true })); 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Use user routes
 app.use('/api/users', userRoutes);
+app.use("/api/resto", RestoRoter)
 // Middleware
 // app.use(cors({
 //   origin: process.env.CLIENT_URL || 'http://localhost:3000',
@@ -30,7 +32,7 @@ app.use(cookieParser()); // Add cookie parser
 
 // Routes
 app.use('/api/admin', adminRoutes);
-app.use('/api/driver', DriverRouter);
+// app.use('/api/driver', DriverRouter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

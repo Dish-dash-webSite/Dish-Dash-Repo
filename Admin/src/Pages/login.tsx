@@ -35,26 +35,37 @@ const Login: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-                <h2 className="text-2xl font-bold mb-6 text-center">Admin Login</h2>
-                {error && <div className="mb-4 text-red-500 text-center">{error}</div>}
-                <form onSubmit={handleLogin}>
-                    <div className="mb-4">
-                        <label className="block text-gray-700 mb-2" htmlFor="email">
-                            Email
+        <div className="min-h-screen flex items-center justify-center bg-[#000033]">
+            <div className="bg-white p-10 rounded-2xl shadow-2xl w-full max-w-md transform transition-all hover:scale-[1.02]">
+                <div className="text-center mb-8">
+                    <h1 className="text-4xl font-bold text-[#000033] mb-2">Welcome Back</h1>
+                    <p className="text-gray-600">Sign in to your admin account</p>
+                </div>
+                
+                {error && (
+                    <div className="mb-6 p-3 bg-red-50 text-red-600 rounded-lg text-center">
+                        {error}
+                    </div>
+                )}
+
+                <form onSubmit={handleLogin} className="space-y-6">
+                    <div>
+                        <label className="block text-sm font-medium text-[#000033] mb-2" htmlFor="email">
+                            Email Address
                         </label>
                         <input
                             type="email"
                             id="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF8000] focus:border-transparent transition-all"
+                            placeholder="Enter your email"
                             required
                         />
                     </div>
-                    <div className="mb-6">
-                        <label className="block text-gray-700 mb-2" htmlFor="password">
+                    
+                    <div>
+                        <label className="block text-sm font-medium text-[#000033] mb-2" htmlFor="password">
                             Password
                         </label>
                         <input
@@ -62,18 +73,31 @@ const Login: React.FC = () => {
                             id="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF8000] focus:border-transparent transition-all"
+                            placeholder="Enter your password"
                             required
                         />
                     </div>
+
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                        className="w-full bg-[#FF8000] text-white py-3 px-4 rounded-xl hover:bg-[#e67300] transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#FF8000] focus:ring-offset-2"
                     >
-                        {loading ? 'Logging in...' : 'Login'}
+                        {loading ? (
+                            <div className="flex items-center justify-center">
+                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                                Logging in...
+                            </div>
+                        ) : (
+                            'Login'
+                        )}
                     </button>
                 </form>
+
+                <div className="mt-6 text-center text-sm text-gray-600">
+                    <p>Don't have an account? <a href="#" className="text-[#FF8000] hover:text-[#e67300]">Contact admin</a></p>
+                </div>
             </div>
         </div>
     );

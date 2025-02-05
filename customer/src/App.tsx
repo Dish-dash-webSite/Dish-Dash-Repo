@@ -3,16 +3,15 @@
 // import DeliveryPages from './AllPages/DeliveryPages';
 // import ClientPages from './AllPages/ClientPages';
 
-// function App() {
-//   return (
-//     <Router>
-//       <Routes>
-//         <Route path="/owner/*" element={<OwnerRestaurantPages />} />
-//         <Route path="/delivery/*" element={<DeliveryPages />} />
-//         <Route path="/client/*" element={<ClientPages />} />
-//       </Routes>
-//     </Router>
-//   );
-// }
+import AllPages from './AllPages';
 
-// export default App;
+function App() {
+  return (
+    <div className="App">
+      {/* ... other components ... */}
+      <AllPages />
+    </div>
+  );
+}
+
+export default App;

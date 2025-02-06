@@ -1,14 +1,6 @@
 // Restaurant.js
 module.exports = (sequelize, DataTypes) => {
     const Restaurant = sequelize.define('Restaurant', {
-      userId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-          model: 'Users',
-          key: 'id',
-        },
-      },
       name: {
         type: DataTypes.STRING,
         allowNull: false,

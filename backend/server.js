@@ -7,6 +7,7 @@ const port = 3000;
 const db = require("./database/connection.js");
 const adminRoutes = require("./routes/adminRoutes");
 const userRoutes = require("./routes/userRoutes");
+const DriverRouter= require("./routes/driverRoutes.js");
 
 
 const app = express();
@@ -37,7 +38,7 @@ app.use("/api/resto", RestoRoter); // Add cookie parser
 
 // Routes
 app.use('/api/admin', adminRoutes);
-// app.use('/api/driver', DriverRouter);
+app.use('/api/driver', DriverRouter);
 // ✅ Middleware
 // ✅ CORS Configuration for Cookies
 

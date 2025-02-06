@@ -5,13 +5,9 @@ import { logoutUser } from '../store/authThunks';
 import { MapPin, ShoppingBag, /*Search, */User, LogOut } from 'lucide-react';
 
 
-
-
-
 const Navbar = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
-
 
   const handleLogout = () => {
     dispatch(logoutUser());

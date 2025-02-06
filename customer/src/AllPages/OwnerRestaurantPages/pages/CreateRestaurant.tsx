@@ -3,9 +3,8 @@ import Flag from 'react-world-flags'; // Import the Flag component
 
 interface RestaurantFormData {
     name: string;
-    cuisine: string;
+    cuisine: string[];
     address: string;
-    rating: number;
     contactNumber: string;
     openingTime: string;
     closingTime: string;
@@ -14,23 +13,42 @@ interface RestaurantFormData {
 const RestaurantForm: React.FC = () => {
     const [formData, setFormData] = useState<RestaurantFormData>({
         name: '',
-        cuisine: '',
+        cuisine: [],
         address: '',
-        rating: 1,
         contactNumber: '',
         openingTime: '',
         closingTime: '',
     });
 
     const [formErrors, setFormErrors] = useState<Partial<RestaurantFormData>>({});
+    const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
 
-    // Handle input changes dynamically
-    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
+    // Cuisine options list
+    const cuisineOptions = [
+        "Italian", "Chinese", "Mexican", "Indian", "French", "Japanese", "Thai", "American"
+    ];
+
+    const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
         const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
+
+        if (name === 'cuisine') {
+            const selectedCuisine = value;
+            setFormData((prevData) => {
+                const updatedCuisine = prevData.cuisine.includes(selectedCuisine)
+                    ? prevData.cuisine.filter(cuisine => cuisine !== selectedCuisine)
+                    : [...prevData.cuisine, selectedCuisine];
+
+                return {
+                    ...prevData,
+                    [name]: updatedCuisine,
+                };
+            });
+        } else {
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: value,
+            }));
+        }
 
         // Clear error if field is corrected
         setFormErrors((prevErrors) => ({
@@ -48,7 +66,7 @@ const RestaurantForm: React.FC = () => {
             isValid = false;
         }
 
-        if (!formData.cuisine) {
+        if (!formData.cuisine.length) {
             errors.cuisine = 'Cuisine is required';
             isValid = false;
         }
@@ -112,18 +130,39 @@ const RestaurantForm: React.FC = () => {
                             {formErrors.name && <p className="text-red-500 text-sm">{formErrors.name}</p>}
                         </div>
 
-                        {/* Cuisine */}
+                        {/* Cuisine (Custom Multi-Select Dropdown with Chips/Tags) */}
                         <div className="mb-4">
                             <label htmlFor="cuisine" className="block text-sm font-medium text-gray-700">Cuisine</label>
-                            <input
-                                type="text"
-                                id="cuisine"
-                                name="cuisine"
-                                value={formData.cuisine}
-                                onChange={handleChange}
-                                className={`mt-1 block w-full px-3 py-2 border ${formErrors.cuisine ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm`}
-                                required
-                            />
+                            <div
+                                className="relative"
+                                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                            >
+                                <div className="flex flex-wrap gap-2 p-2 border rounded-md bg-transparent cursor-pointer focus:ring-orange-500 focus:border-orange-500">
+                                    {/* Display selected cuisines as tags */}
+                                    {formData.cuisine.map((cuisine, index) => (
+                                        <span key={index} className="bg-orange-200 text-orange-600 px-2 py-1 rounded-full text-xs">
+                                            {cuisine}
+                                        </span>
+                                    ))}
+                                    {/* If no cuisines are selected, display a placeholder */}
+                                    {formData.cuisine.length === 0 && <span className="text-gray-400">Select Cuisine...</span>}
+                                </div>
+
+                                {/* Dropdown Menu */}
+                                {isDropdownOpen && (
+                                    <div className="absolute z-10 w-full mt-2 bg-white border border-gray-300 rounded-md shadow-lg max-h-40 overflow-y-auto">
+                                        {cuisineOptions.map((cuisine, index) => (
+                                            <div
+                                                key={index}
+                                                className={`cursor-pointer px-4 py-2 text-sm hover:bg-orange-100 ${formData.cuisine.includes(cuisine) ? 'bg-orange-200' : ''}`}
+                                                onClick={() => handleChange({ target: { name: 'cuisine', value: cuisine } } as ChangeEvent<HTMLInputElement>)}
+                                            >
+                                                {cuisine}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                             {formErrors.cuisine && <p className="text-red-500 text-sm">{formErrors.cuisine}</p>}
                         </div>
 
@@ -187,24 +226,6 @@ const RestaurantForm: React.FC = () => {
                                 />
                                 {formErrors.closingTime && <p className="text-red-500 text-sm">{formErrors.closingTime}</p>}
                             </div>
-                        </div>
-
-                        {/* Rating with Stars */}
-                        <div className="mb-6">
-                            <label htmlFor="rating" className="block text-sm font-medium text-gray-700">Rating</label>
-                            <div className="flex space-x-1">
-                                {[1, 2, 3, 4, 5].map((star) => (
-                                    <button
-                                        key={star}
-                                        type="button"
-                                        onClick={() => setFormData((prevData) => ({ ...prevData, rating: star }))}
-                                        className={`text-2xl ${formData.rating >= star ? 'text-yellow-500' : 'text-gray-300'}`}
-                                    >
-                                        &#9733;
-                                    </button>
-                                ))}
-                            </div>
-                            {formErrors.rating && <p className="text-red-500 text-sm">{formErrors.rating}</p>}
                         </div>
 
                         {/* Submit Button */}

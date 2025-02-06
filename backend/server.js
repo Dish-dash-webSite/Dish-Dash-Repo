@@ -27,6 +27,6 @@ app.use('/api/admin', adminRoutes);
 
 // ✅ Start Server
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Server is running on http://localhost:3000`);
 });
 

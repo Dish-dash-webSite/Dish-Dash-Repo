@@ -169,7 +169,7 @@ const adminController = {
     CrateRestaurant: async (req, res) => {
         const { name, cuisineType, address, contactNumber, openingH, closingH, rating } = req.body
         try {
-            const restaurant = await Restaurant.create({ name, cuisineType, address: address, contactNumber, openingH, closingH, rating, userId: 5, restaurantOwnerId: 5 })
+            const restaurant = await Restaurant.create({ name, cuisineType, address: address, contactNumber, openingH, closingH, rating, restaurantOwnerId: 2 })
             res.status(200).send({ message: { restaurant } })
         } catch (err) {
             console.log("err", err)

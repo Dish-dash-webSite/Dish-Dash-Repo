@@ -9,8 +9,8 @@ interface RestaurantState {
     address: string;
     rating: number;
     contactNumber: string;
-    openingTime: string;
-    closingTime: string;
+    openingH: string;
+    closingH: string;
     loading: boolean;
     successMessage: string | null;
     error: string | null;
@@ -22,8 +22,8 @@ const initialState: RestaurantState = {
     address: '',
     rating: 0,
     contactNumber: '',
-    openingTime: '',
-    closingTime: '',
+    openingH: '',
+    closingH: '',
     loading: false,
     successMessage: null,
     error: null,

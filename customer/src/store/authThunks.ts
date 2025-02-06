@@ -1,40 +1,96 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { UserSignin, UserSignup, AuthResponse } from "../types/index";
 
-const API_URL = "/api/users";
+const API_URL = "http://localhost:3000/api/users";
 
-// ✅ Login user (uses cookies instead of localStorage)
+axios.defaults.withCredentials = true;
+
+// Login user
 export const loginUser = createAsyncThunk(
   "auth/login",
-  async (credentials, { rejectWithValue }) => {
+  async (credentials: UserSignin, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}/login`, credentials, {
-        withCredentials: true, // ✅ Allow cookies
+      console.log('Making login request to:', `${API_URL}/login`);
+      const response = await axios.post<AuthResponse>(`${API_URL}/login`, credentials, {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json',
+        }
       });
-      return response.data; // No need to manually store tokens
+      console.log('Login response:', response.data);
+      return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || "Login failed");
+      console.error('Login error:', {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message
+      });
+      return rejectWithValue(
+        error.response?.data?.message || 
+        error.message || 
+        "Login failed"
+      );
     }
   }
 );
 
-// ✅ Fetch user profile (cookies will handle auth)
+// Register user
+export const registerUser = createAsyncThunk(
+  'auth/register',
+  async (userData: UserSignup, { rejectWithValue }) => {
+    try {
+      const response = await axios.post<AuthResponse>(`${API_URL}/register`, userData, {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || 
+        error.message || 
+        "Registration failed"
+      );
+    }
+  }
+);
+
+// Fetch user profile
 export const fetchUserProfile = createAsyncThunk(
   "auth/fetchProfile",
   async (_, { rejectWithValue }) => {
     try {
       const response = await axios.get(`${API_URL}/profile`, {
-        withCredentials: true, // ✅ Ensure cookies are sent
+        withCredentials: true,
       });
       return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || "Failed to fetch profile");
+      return rejectWithValue(
+        error.response?.data?.message || 
+        error.message || 
+        "Failed to fetch profile"
+      );
     }
   }
 );
 
-// ✅ Logout user (cookies will be cleared server-side)
-export const logoutUser = createAsyncThunk("auth/logout", async () => {
-  await axios.post(`${API_URL}/logout`, {}, { withCredentials: true });
-  return null;
-});
+// Logout user
+export const logoutUser = createAsyncThunk(
+  "auth/logout", 
+  async (_, { rejectWithValue }) => {
+    try {
+      await axios.post(`${API_URL}/logout`, {}, { 
+        withCredentials: true 
+      });
+      return null;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || 
+        error.message || 
+        "Logout failed"
+      );
+    }
+  }
+);

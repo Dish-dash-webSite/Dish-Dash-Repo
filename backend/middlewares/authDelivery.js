@@ -1,29 +1,20 @@
 const jwt = require('jsonwebtoken');
-const { JWT_SECRET } = require('../config'); // Ensure you have your JWT_SECRET in a config file
+const JWT_SECRET = process.env.JWT_SECRET || '1234';
 
-const authenticateToken = (req, res, next) => {
-    // Extract the token from the cookies
-    const token = req.cookies.token;
-
-    if (!token) {
-        return res.status(401).json({ error: "Access denied. No token provided." });
-    }
-
+const authMiddleware = (req, res, next) => {
     try {
-        // Verify the token
-        const decoded = jwt.verify(token, JWT_SECRET);
+        const token = req.cookies?.auth_token;
+        if (!token) return res.status(401).json({ message: 'Unauthorized, no token provided' });
 
-        // Attach the decoded data to the request object
-        req.user = {
-            userId: decoded.userId,
-            role: decoded.role,
-            driverId: decoded.driverId,
-            customerId: decoded.customerId,
-        };
-        next();
-    } catch (err) {
-        return res.status(403).json({ error: "Invalid or expired token." });
+        jwt.verify(token, JWT_SECRET, (err, decoded) => {
+            if (err) return res.status(403).json({ message: 'Invalid token' });
+            req.user = decoded; // Attach user data to request object
+            next();
+        });
+    } catch (error) {
+        
+        res.status(500).json({ message: 'Internal Server Error' });
     }
 };
 
-module.exports = authenticateToken;
+module.exports = authMiddleware;

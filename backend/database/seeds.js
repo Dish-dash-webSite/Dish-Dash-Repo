@@ -185,7 +185,7 @@ const seedsRestaurant = async () => {
   try {
     const restaurants = [
       {
-        restaurantOwner: 2,
+        restaurantOwner: 1,
         name: 'Pasta Paradise',
         address: '123 Noodle St, Pasta Town, PT 12345',
         cuisineType: 'Italian',
@@ -197,7 +197,7 @@ const seedsRestaurant = async () => {
         updatedAt: new Date(),
       },
       {
-        restaurantOwner: 2,
+        restaurantOwner: 1,
         name: 'Sushi Sensation',
         address: '456 Sushi Ave, Sushi City, SC 23456',
         cuisineType: 'Japanese',
@@ -209,7 +209,7 @@ const seedsRestaurant = async () => {
         updatedAt: new Date(),
       },
       {
-        restaurantOwner: 2,
+        restaurantOwner: 1,
         name: 'Burger Haven',
         address: '789 Burger Blvd, Grilltown, GT 34567',
         cuisineType: 'American',
@@ -221,7 +221,7 @@ const seedsRestaurant = async () => {
         updatedAt: new Date(),
       },
       {
-        restaurantOwner: 2,
+        restaurantOwner: 1,
         name: 'Taco Fiesta',
         address: '101 Taco Rd, Spiceville, SV 45678',
         cuisineType: 'Mexican',
@@ -259,11 +259,11 @@ const seedsRestaurantOwner = async () => {
   }
 }
 
-seedUser()
-seedCustomer()
-seedsRestaurantOwner()
+// seedUser()
+// seedCustomer()
+// seedsRestaurantOwner()
 seedsRestaurant()
-seedDriver()
-seedCategory()
-seedGeolocation()
-seedMenuItem()
+// seedDriver()
+// seedCategory()
+// seedGeolocation()
+// seedMenuItem()

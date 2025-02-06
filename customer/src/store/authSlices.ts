@@ -1,65 +1,26 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { loginUser, registerUser, fetchUserProfile, logoutUser } from "./authThunks";
-import { AuthState } from "../types/index";
+import { loginUser, fetchUserProfile, logoutUser } from "./authThunks";
 
-const initialState: AuthState = {
-  user: null,
-  token: null,
-  loading: false,
-  error: null,
-};
+const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
 const authSlice = createSlice({
   name: "auth",
-  initialState,
-  reducers: {
-    clearError: (state) => {
-      state.error = null;
-    },
+  initialState: {
+    user: null,
+    token: token || null,
+    isLoading: false,
+    error: null as string | null,
   },
+  reducers: {},
   extraReducers: (builder) => {
     builder
-      // Login cases
-      .addCase(loginUser.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
       .addCase(loginUser.fulfilled, (state, action) => {
-        state.loading = false;
         state.user = action.payload.user;
         state.token = action.payload.token;
-      })
-      .addCase(loginUser.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      })
-      // Register cases
-      .addCase(registerUser.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(registerUser.fulfilled, (state, action) => {
-        state.loading = false;
-        state.user = action.payload.user;
-        state.token = action.payload.token;
-      })
-      .addCase(registerUser.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      })
-      // Profile cases
-      .addCase(fetchUserProfile.pending, (state) => {
-        state.loading = true;
       })
       .addCase(fetchUserProfile.fulfilled, (state, action) => {
-        state.loading = false;
         state.user = action.payload;
       })
-      .addCase(fetchUserProfile.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      })
-      // Logout case
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
         state.token = null;
@@ -67,7 +28,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearError } = authSlice.actions;
 export default authSlice.reducer;
 
 

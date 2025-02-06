@@ -1,8 +1,3 @@
-
-
-
-
-
 import { createSlice } from "@reduxjs/toolkit";
 import { loginUser, fetchUserProfile, logoutUser } from "./authThunks";
 

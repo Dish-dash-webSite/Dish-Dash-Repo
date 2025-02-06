@@ -1,25 +1,26 @@
 {
   "compilerOptions": {
-    "module": "ESNext", // Change from "commonjs" to "ESNext"
-    "target": "ES6", // Upgrade from "es5" to "es6"
-    "allowJs": true,
-    "checkJs": false,
-    "jsx": "react-jsx", // Use "react-jsx" for React 17+ (if using React 17+)
-    "outDir": "./build",
-    "rootDir": "./src",
-    "removeComments": true,
-    "noEmit": true,
-    "pretty": true,
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
     "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
     "strict": true,
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true // Add this for better compatibility
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true
   },
-  "include": [
-    "src/*/"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["src"]
 }

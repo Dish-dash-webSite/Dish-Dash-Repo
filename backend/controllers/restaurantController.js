@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const { Op } = require('sequelize'); // Sequelize operators for filtering
 const { User, RestaurantOwner } = require('../database/associations');
 // const bcrypt = require('bcrypt');
@@ -170,7 +171,11 @@ const RestoController = {
     CrateRestaurant: async (req, res) => {
         const { name, cuisineType, address, contactNumber, openingH, closingH, rating } = req.body
         try {
+<<<<<<< HEAD
+            const restaurant = await Restaurant.create({ name, cuisineType, address: address, contactNumber, openingH, closingH, rating, restaurantOwnerId: 2 })
+=======
             const restaurant = await RestaurantOwner.create({ name, cuisineType, address: address, contactNumber, openingH, closingH, rating, userId: 5, restaurantOwnerId: 5 })
+>>>>>>> 72ea97b27ec8b10d4adf4f362b6044c8ecfc81d7
             res.status(200).send({ message: { restaurant } })
         } catch (err) {
             console.log("err", err)
@@ -274,3 +279,6 @@ module.exports = RestoController;
 //         res.status(500).json({ error: 'Internal Server Error' });
 //     }
 // };
+=======
+// restaurantController.js
+>>>>>>> a3b43b85a59a1d862da71c0b2daccab2c00686e9

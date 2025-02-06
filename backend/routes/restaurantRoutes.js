@@ -11,6 +11,6 @@ routerResto.post('/login', validateLogin, RestoController.login);
 
 // Admin registration route
 routerResto.post('/register', RestoController.register);
-routerResto.get("/All/:id", RestoController.getAllRestaurant)
+routerResto.post("/create", RestoController.CrateRestaurant)
 
 module.exports = routerResto; 

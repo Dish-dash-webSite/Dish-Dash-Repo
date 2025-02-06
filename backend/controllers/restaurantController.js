@@ -1,4 +1,4 @@
-const { User } = require('../database/associations');
+const { User, Restaurant } = require('../database/associations');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -24,7 +24,7 @@ const adminController = {
             const resto = await User.findOne({
                 where: {
                     email,
-                    role: 'restaurant'
+                    role: 'restaurantOwner'
                 }
             });
 
@@ -54,14 +54,14 @@ const adminController = {
             // Generate JWT token
             const token = jwt.sign(
                 { id: resto.id, role: resto.role },
-                process.env.JWT_SECRET || 'your-secret-key',
+                '1234',
                 { expiresIn: '24h' }
             );
 
             // Set token in cookie
             res.cookie('restoToken', token, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
+                secure: 'production',
                 sameSite: 'strict',
                 maxAge: 3600000 * 24 * 7
             });
@@ -82,7 +82,7 @@ const adminController = {
             res.status(500).json({
                 success: false,
                 message: 'Internal server error',
-                error: process.env.NODE_ENV === 'development' ? error.message : undefined
+                error: 'development' ? error.message : undefined
             });
         }
     },
@@ -114,7 +114,7 @@ const adminController = {
             }
 
             // Check if email already exists
-            const existingResto = await User.findOne({ where: { email, role: "restaurant" } });
+            const existingResto = await User.findOne({ where: { email, role: "restaurantOwner" } });
             if (existingResto) {
                 return res.status(409).json({
                     success: false,
@@ -130,7 +130,7 @@ const adminController = {
                 name,
                 email,
                 passwordHash,
-                role: 'restaurant'
+                role: "restaurantOwner"
             });
 
             // Generate JWT token
@@ -166,15 +166,14 @@ const adminController = {
             });
         }
     },
-    getAllRestaurant: async (req, res) => {
-        const { id } = req.params
+    CrateRestaurant: async (req, res) => {
+        const { name, cuisineType, address, contactNumber, openingH, closingH, rating } = req.body
         try {
-            const restaurants = await restaurants.findAll({ where: { id } })
-            console.log("ress", restaurants)
-            res.status(200).send(restaurants)
+            const restaurant = await Restaurant.create({ name, cuisineType, address: address, contactNumber, openingH, closingH, rating, userId: 5, restaurantOwnerId: 5 })
+            res.status(200).send({ message: { restaurant } })
         } catch (err) {
             console.log("err", err)
-            res.status(404).sent(err)
+            res.status(404).send(err)
         }
     }
 };

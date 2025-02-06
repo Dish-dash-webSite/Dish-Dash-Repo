@@ -72,17 +72,27 @@ exports.login = [
             const { email, password } = req.body;
 
             // Find user with debug logging
-            const user = await User.findOne({ where: { email } });
-            console.log('User found:', user ? 'Yes' : 'No');
-            if (!user) return res.status(400).json({ message: "Invalid credentials" });
-
-            // Debug log the stored hash
-            console.log('Stored passwordHash:', user.passwordHash);
+            const user = await User.findOne({ 
+                where: { email },
+                include: [{
+                    model: Customer,
+                    attributes: ['firstName', 'lastName', 'deliveryAddress']
+                }]
+            });
             
-            // Check password with debug logging
+            console.log('Login attempt:', { email, userFound: !!user });
+            
+            if (!user) {
+                return res.status(400).json({ message: "Invalid credentials" });
+            }
+
+            // Check password
             const isMatch = await bcrypt.compare(password, user.passwordHash);
-            console.log('Password match:', isMatch ? 'Yes' : 'No');
-            if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
+            console.log('Password match:', isMatch);
+            
+            if (!isMatch) {
+                return res.status(400).json({ message: "Invalid credentials" });
+            }
 
             // Generate JWT Token
             const token = generateToken(user);
@@ -92,16 +102,30 @@ exports.login = [
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
                 sameSite: "Strict",
-                maxAge: 144 * 60 * 60 * 1000, 
+                maxAge: 24 * 60 * 60 * 1000, // 24 hours
             });
 
-            // Remove sensitive data before sending user info
-            const { password: _, ...userData } = user.toJSON();
+            // Format user data to match frontend expectations
+            const userData = {
+                id: user.id,
+                email: user.email,
+                role: user.role,
+                name: user.Customer ? `${user.Customer.firstName} ${user.Customer.lastName}` : '',
+                phoneNumber: user.phoneNumber || '',
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt
+            };
 
-            res.json({ message: "Login successful", user: userData });
+            // Send response matching AuthResponse type
+            res.json({
+                user: userData,
+                token: token,
+                message: "Login successful"
+            });
+
         } catch (error) {
             console.error("Login error:", error);
-            res.status(500).json({ message: "Internal server error", error });
+            res.status(500).json({ message: "Internal server error" });
         }
     },
 ];

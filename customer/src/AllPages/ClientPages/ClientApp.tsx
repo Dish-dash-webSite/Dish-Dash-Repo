@@ -1,7 +1,8 @@
 import { Routes, Route } from "react-router-dom";
 import Homepage from "./pages/Homepage"
-import SignUp from "./pages/SignUp"
+import SignUp from "./pages/Signup"
 import Login from "./pages/Login"
+
 
 const ClientApp: React.FC = () => {
   return (
@@ -12,5 +13,9 @@ const ClientApp: React.FC = () => {
     </Routes>
   );
 };
+
+
+
+
 
 export default ClientApp;

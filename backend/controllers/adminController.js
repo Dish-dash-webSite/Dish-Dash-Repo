@@ -1,4 +1,4 @@
-const { User } = require('../database/associations');
+const { User, Restaurant } = require('../database/associations');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -40,7 +40,7 @@ const adminController = {
 
             // Verify password using bcrypt.compare
             const isPasswordValid = await bcrypt.compare(password, admin.passwordHash);
-            
+
             if (!isPasswordValid) {
                 console.log('Password verification failed for:', email);
                 return res.status(401).json({
@@ -63,7 +63,7 @@ const adminController = {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: 'strict',
-                maxAge: 3600000 *24 *7
+                maxAge: 3600000 * 24 * 7
             });
 
             console.log('Login successful for:', email);
@@ -144,7 +144,7 @@ const adminController = {
             res.cookie('adminToken', token, {
                 httpOnly: true,
                 sameSite: 'strict',
-                maxAge: 7* 24 * 60 * 60 * 1000
+                maxAge: 7 * 24 * 60 * 60 * 1000
             });
 
             res.status(201).json({

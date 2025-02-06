@@ -1,23 +1,39 @@
 const express = require('express');
-const router = express.Router();
-const restaurantController = require('../controllers/restaurantController'); // Import controller
+const routerResto = express.Router();
+const RestoController = require('../controllers/restaurantController');
+const validateLogin = require('../middlewares/restoOwner');
+
+// Public routes
+// routerResto.post('/login', validateLogin, RestoController.login);
+
+// Protected routes
+// routerResto.post('/logout', logout);
+
+// Admin registration route
+// routerResto.post('/register', RestoController.register);
+// routerResto.post("/create", RestoController.CrateRestaurant)
+
+ // Import controller
 
 // Get all restaurants
-router.get('/', restaurantController.getAllRestaurants);
+routerResto.get('/', RestoController.getAllRestaurants);
 
 // Get a single restaurant by ID
-router.get('/:id', restaurantController.getRestaurantById);
+routerResto.get('/:id', RestoController.getRestaurantById);
 
 // Create a new restaurant
-router.post('/', restaurantController.createRestaurant);
+// router.post('/', RestoController.CrateRestaurant);
+
 
 // Update a restaurant
-router.put('/:id', restaurantController.updateRestaurant);
+routerResto.put('/:id', RestoController.updateRestaurant);
+
 
 // Delete a restaurant
-router.delete('/:id', restaurantController.deleteRestaurant);
+routerResto.delete('/:id', RestoController.deleteRestaurant);
 
-module.exports = router;
+
+module.exports = routerResto;
 
 
 

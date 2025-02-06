@@ -23,8 +23,7 @@ const defaultImages = [
 const RestaurantList = () => {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [filteredRestaurants, setFilteredRestaurants] = useState<Restaurant[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filters, setFilters] = useState({ cuisine: "", rating: 0 });
+  const [activeFilter, setActiveFilter] = useState<string | null>(null);
 
   // Fetch restaurants from API
   useEffect(() => {
@@ -37,8 +36,14 @@ const RestaurantList = () => {
           ...restaurant,
           image: restaurant.image || defaultImages[index % defaultImages.length]
         }));
+        
+        // Initially show only restaurants with categories
+        const restaurantsWithCategories = restaurantsWithImages.filter(
+          restaurant => restaurant.cuisine
+        );
+        
         setRestaurants(restaurantsWithImages);
-        setFilteredRestaurants(restaurantsWithImages);
+        setFilteredRestaurants(restaurantsWithCategories);
       } catch (error) {
         console.error("Error fetching restaurants:", error);
         setRestaurants([]);
@@ -48,25 +53,19 @@ const RestaurantList = () => {
     fetchRestaurants();
   }, []);
 
-  const updateFilters = (cuisine: string, rating: number) => {
-    setFilters({ cuisine, rating });
-    const filtered = restaurants.filter(restaurant => 
-      (restaurant.cuisine || '').includes(cuisine) && 
-      (restaurant.rating || 0) >= rating
-    );
-    setFilteredRestaurants(filtered);
-  };
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const searchValue = e.target.value;
-    setSearchTerm(searchValue);
-    
-    const filtered = restaurants.filter(restaurant => 
-      restaurant.name.toLowerCase().includes(searchValue.toLowerCase()) &&
-      (restaurant.cuisine || '').includes(filters.cuisine) && 
-      (restaurant.rating || 0) >= filters.rating
-    );
-    setFilteredRestaurants(filtered);
+  const handleFilterClick = (cuisine: string) => {
+    if (activeFilter === cuisine) {
+      // If clicking the same filter, show all restaurants with categories
+      setFilteredRestaurants(restaurants.filter(r => r.cuisine));
+      setActiveFilter(null);
+    } else {
+      // Filter by selected cuisine
+      const filtered = restaurants.filter(
+        restaurant => restaurant.cuisine === cuisine
+      );
+      setFilteredRestaurants(filtered);
+      setActiveFilter(cuisine);
+    }
   };
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
@@ -85,60 +84,72 @@ const RestaurantList = () => {
       </div>
 
       <div className="mb-8 max-w-2xl mx-auto">
-        <input
-          type="text"
-          placeholder="Search restaurants..."
-          value={searchTerm}
-          onChange={handleSearch}
-          className="w-full p-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 shadow-sm"
-        />
         <div className="flex space-x-4 mt-4 justify-center">
           <button 
-            onClick={() => updateFilters('Italian', 0)}
-            className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition shadow-sm"
+            onClick={() => handleFilterClick('Italian')}
+            className={`px-6 py-2 ${
+              activeFilter === 'Italian' ? 'bg-orange-600' : 'bg-orange-500'
+            } text-white rounded-lg hover:bg-orange-600 transition shadow-sm`}
           >
             Italian
           </button>
           <button 
-            onClick={() => updateFilters('', 4)}
-            className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition shadow-sm"
+            onClick={() => handleFilterClick('Mexican')}
+            className={`px-6 py-2 ${
+              activeFilter === 'Mexican' ? 'bg-orange-600' : 'bg-orange-500'
+            } text-white rounded-lg hover:bg-orange-600 transition shadow-sm`}
           >
-            4+ Stars
+            Mexican
+          </button>
+          <button 
+            onClick={() => handleFilterClick('Asian')}
+            className={`px-6 py-2 ${
+              activeFilter === 'Asian' ? 'bg-orange-600' : 'bg-orange-500'
+            } text-white rounded-lg hover:bg-orange-600 transition shadow-sm`}
+          >
+            Asian
           </button>
         </div>
       </div>
 
       <div className="grid md:grid-cols-3 gap-8">
-        {Array.isArray(filteredRestaurants) && filteredRestaurants.map((restaurant, index) => (
-          <div key={restaurant.id} className="bg-white rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition duration-300">
-            <div className="relative">
-              <img
-                src={restaurant.image || defaultImages[index % defaultImages.length]}
-                alt={restaurant.name}
-                className="w-full h-48 object-cover"
-                onError={handleImageError}
-              />
-              {restaurant.rating && (
-                <div className="absolute top-2 right-2 bg-orange-500 text-white px-2 py-1 rounded-lg text-sm">
-                  ⭐ {restaurant.rating}
-                </div>
-              )}
-            </div>
-            <div className="p-5">
-              <h3 className="text-xl font-semibold mb-3">{restaurant.name}</h3>
-              <div className="flex items-center text-gray-600 mb-3">
-                <MapPin className="w-4 h-4 mr-2" />
-                <span>{restaurant.location || 'Location not available'}</span>
+        {Array.isArray(filteredRestaurants) && filteredRestaurants.length > 0 ? (
+          filteredRestaurants.map((restaurant, index) => (
+            <div key={restaurant.id} className="bg-white rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition duration-300">
+              <div className="relative">
+                <img
+                  src={restaurant.image || defaultImages[index % defaultImages.length]}
+                  alt={restaurant.name}
+                  className="w-full h-48 object-cover"
+                  onError={handleImageError}
+                />
+                {restaurant.rating && (
+                  <div className="absolute top-2 right-2 bg-orange-500 text-white px-2 py-1 rounded-lg text-sm">
+                    ⭐ {restaurant.rating}
+                  </div>
+                )}
               </div>
-              <button
-                onClick={() => {/* Add your navigation logic here */}}
-                className="text-orange-500 font-semibold hover:text-orange-600 flex items-center"
-              >
-                View Menu <span className="ml-2">→</span>
-              </button>
+              <div className="p-5">
+                <h3 className="text-xl font-semibold mb-3">{restaurant.name}</h3>
+                <div className="flex items-center text-gray-600 mb-3">
+                  <MapPin className="w-4 h-4 mr-2" />
+                  <span>{restaurant.location || 'Location not available'}</span>
+                </div>
+                <button
+                  onClick={() => {/* Add your navigation logic here */}}
+                  className="text-orange-500 font-semibold hover:text-orange-600 flex items-center"
+                >
+                  View Menu <span className="ml-2">→</span>
+                </button>
+              </div>
             </div>
+          ))
+        ) : (
+          <div className="col-span-full text-center py-20">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">No restaurants found</h2>
+            <p className="text-gray-600">Try adjusting your search or filters</p>
           </div>
-        ))}
+        )}
       </div>
     </div>
   );

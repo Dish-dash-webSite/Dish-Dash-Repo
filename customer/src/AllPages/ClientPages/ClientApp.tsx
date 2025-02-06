@@ -1,12 +1,15 @@
-import RestaurantList from './components/RestaurantList';
+import { Routes, Route } from "react-router-dom";
+import Homepage from "./pages/Homepage"
+import SignUp from "./pages/SignUp"
+import Login from "./pages/Login"
 
-const ClientApp = () => {
+const ClientApp: React.FC = () => {
   return (
-    <div className="client-app">
-      <h1>Client Dashboard</h1>
-      <p>Welcome to the client section!</p>
-      <RestaurantList />
-    </div>
+    <Routes>
+      <Route path="/" element={<Homepage />} />
+      <Route path="/signup" element={<SignUp />} />
+      <Route path="/login" element={<Login />} />
+    </Routes>
   );
 };
 

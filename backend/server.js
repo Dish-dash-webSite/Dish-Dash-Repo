@@ -12,7 +12,7 @@ const restaurantRoutes = require('./routes/restaurantRoutes')
 
 
 const app = express();
-const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174'];
+const allowedOrigins = ['http://localhost:5173', 'http://localhost:5180'];
 
 app.use(cors({
   origin: function (origin, callback) {
@@ -57,13 +57,14 @@ app.use(
 );
 
 // ✅ Routes
-app.use("/api/users", userRoutes);
+app.use("/api/users", userRoutes );
 app.use("/api/admin", adminRoutes);
 app.use('/api/restaurants', restaurantRoutes)
 
 // ✅ Error Handling Middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
+
   res.status(500).json({
     success: false,
     message: "Internal Server Error",

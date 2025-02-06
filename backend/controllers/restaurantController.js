@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const { Op } = require('sequelize'); // Sequelize operators for filtering
 const { User, RestaurantOwner } = require('../database/associations');
 // const bcrypt = require('bcrypt');
@@ -278,3 +279,6 @@ module.exports = RestoController;
 //         res.status(500).json({ error: 'Internal Server Error' });
 //     }
 // };
+=======
+// restaurantController.js
+>>>>>>> a3b43b85a59a1d862da71c0b2daccab2c00686e9

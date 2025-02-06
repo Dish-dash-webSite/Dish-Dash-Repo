@@ -67,21 +67,13 @@ const Navbar = () => {
                 </button>
               </div>
             ) : (
-              <div className="flex items-center space-x-4">
-                <Link
-                  to="/login"
-                  className="text-gray-600 hover:text-orange-500"
-                >
-                  Login
-                </Link>
-                <Link
-                  to="/signup"
-                  className="bg-orange-500 text-white px-6 py-2 rounded-full flex items-center hover:bg-orange-600"
-                >
-                  <User size={18} className="mr-2" />
-                  Sign Up
-                </Link>
-              </div>
+              <Link
+                to="/login"
+                className="bg-orange-500 text-white px-6 py-2 rounded-full flex items-center hover:bg-orange-600"
+              >
+                <User size={18} className="mr-2" />
+                Login/Signup
+              </Link>
             )}
           </div>
         </div>

@@ -72,27 +72,17 @@ exports.login = [
             const { email, password } = req.body;
 
             // Find user with debug logging
-            const user = await User.findOne({ 
-                where: { email },
-                include: [{
-                    model: Customer,
-                    attributes: ['firstName', 'lastName', 'deliveryAddress']
-                }]
-            });
-            
-            console.log('Login attempt:', { email, userFound: !!user });
-            
-            if (!user) {
-                return res.status(400).json({ message: "Invalid credentials" });
-            }
+            const user = await User.findOne({ where: { email } });
+            console.log('User found:', user ? 'Yes' : 'No');
+            if (!user) return res.status(400).json({ message: "Invalid credentials" });
 
-            // Check password
-            const isMatch = await bcrypt.compare(password, user.passwordHash);
-            console.log('Password match:', isMatch);
+            // Debug log the stored hash
+            console.log('Stored passwordHash:', user.passwordHash);
             
-            if (!isMatch) {
-                return res.status(400).json({ message: "Invalid credentials" });
-            }
+            // Check password with debug logging
+            const isMatch = await bcrypt.compare(password, user.passwordHash);
+            console.log('Password match:', isMatch ? 'Yes' : 'No');
+            if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
             // Generate JWT Token
             const token = generateToken(user);
@@ -102,30 +92,16 @@ exports.login = [
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
                 sameSite: "Strict",
-                maxAge: 24 * 60 * 60 * 1000, // 24 hours
+                maxAge: 144 * 60 * 60 * 1000, 
             });
 
-            // Format user data to match frontend expectations
-            const userData = {
-                id: user.id,
-                email: user.email,
-                role: user.role,
-                name: user.Customer ? `${user.Customer.firstName} ${user.Customer.lastName}` : '',
-                phoneNumber: user.phoneNumber || '',
-                createdAt: user.createdAt,
-                updatedAt: user.updatedAt
-            };
+            // Remove sensitive data before sending user info
+            const { password: _, ...userData } = user.toJSON();
 
-            // Send response matching AuthResponse type
-            res.json({
-                user: userData,
-                token: token,
-                message: "Login successful"
-            });
-
+            res.json({ message: "Login successful", user: userData });
         } catch (error) {
             console.error("Login error:", error);
-            res.status(500).json({ message: "Internal server error" });
+            res.status(500).json({ message: "Internal server error", error });
         }
     },
 ];

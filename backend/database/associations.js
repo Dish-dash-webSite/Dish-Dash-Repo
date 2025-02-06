@@ -83,7 +83,7 @@ Conversation.hasMany(Message, { foreignKey: 'conversationId', onDelete: 'CASCADE
 // Message Associations
 Message.belongsTo(Conversation, { foreignKey: 'conversationId' });
 
-//Sync all models with the database
+// Sync all models with the database
 // connection.sync({ force: true }).then(() => {
 //   console.log('Database & tables created!');
 // });

@@ -1,21 +1,13 @@
 import { Routes, Route } from "react-router-dom";
 import Homepage from "./pages/Homepage"
-import SignUp from "./pages/Signup"
-import Login from "./pages/Login"
-
 
 const ClientApp: React.FC = () => {
   return (
     <Routes>
-      <Route path="/" element={<Homepage />} />
-      <Route path="/signup" element={<SignUp />} />
-      <Route path="/login" element={<Login />} />
+           <Route path="/" element={<Homepage />} />
+
     </Routes>
   );
 };
-
-
-
-
 
 export default ClientApp;

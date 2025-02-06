@@ -261,9 +261,18 @@ const seedsRestaurantOwner = async () => {
 
 // seedUser()
 // seedCustomer()
+<<<<<<< HEAD
 seedsRestaurantOwner()
 // seedsRestaurant()
 // seedDriver()
 // seedCategory()
 // seedGeolocation()
 // seedMenuItem()
+=======
+// seedsRestaurantOwner()
+seedsRestaurant()
+// seedDriver()
+// seedCategory()
+// seedGeolocation()
+// seedMenuItem()
+>>>>>>> a3b43b85a59a1d862da71c0b2daccab2c00686e9

@@ -9,6 +9,7 @@ const Migrate: React.FC = () => {
   const dispatch = useDispatch();
   const isVerified = useSelector((state: any) => state.driver.isVerified);
   const isLoading = useSelector((state: any) => state.driver.isLoading);
+  const driver=useSelector((state: any) => state.driver.driver);
   const error = useSelector((state: any) => state.driver.error);
 
   useEffect(() => {
@@ -23,22 +24,16 @@ const Migrate: React.FC = () => {
   }, [error, dispatch]);
 
   useEffect(() => {
-    // Check if isVerified is available and not loading
-    if (!isLoading && isVerified) {
-      if (isVerified.isDriver) {
+    if (!isLoading) {
+      if (driver?.isDriver) {
+        console.log("driver",driver)
         navigate('/delivery/dashboard');
-      }
-    }
-    console.log("isLoading", isLoading);
-    console.log("isVerified", isVerified);
-    if (!isLoading && !isVerified) {
-     if (!isLoading && isVerified) { // isVerified is now a boolean
-  navigate('/delivery/dashboard');
-} else {
+      } else {
+        console.log("driver",driver)
         navigate('/delivery/form');
       }
     }
-  }, [isVerified, isLoading, navigate]);
+  }, [isVerified, isLoading, navigate])
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-50">

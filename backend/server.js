@@ -15,6 +15,7 @@ const messageRoutes = require('./routes/messageRoutes');
 const { Conversation, Message } = require('./database/associations');
 
 
+
 const app = express();
 const httpServer = createServer(app);
 // const allowedOrigins = ['http://localhost:5173', 'http://localhost:5181'];
@@ -103,7 +104,7 @@ app.use(cookieParser());
 
 // Use routes
 app.use('/api/users', userRoutes);
-app.use("/api/resto", RestoRoter);
+app.use('/api/resto', RestoRoter);
 app.use('/api/admin', adminRoutes);
 app.use('/api/driver', DriverRouter);
 app.use('/api/messages', messageRoutes);

@@ -11,7 +11,6 @@ const db = require("./database/connection.js");
 const adminRoutes = require("./routes/adminRoutes");
 const userRoutes = require("./routes/userRoutes");
 const DriverRouter = require("./routes/driverRoutes.js");
-const DriverRouter = require("./routes/driverRoutes.js");
 const messageRoutes = require('./routes/messageRoutes');
 const { Conversation, Message } = require('./database/associations');
 

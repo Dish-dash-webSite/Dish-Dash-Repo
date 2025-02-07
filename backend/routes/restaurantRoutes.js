@@ -13,11 +13,11 @@ const validateLogin = require('../middlewares/restoOwner');
 // routerResto.post('/register', RestoController.register);
 // routerResto.post("/create", RestoController.CrateRestaurant)
 
- // Import controller
+// Import controller
 
 // Get all restaurants
 routerResto.get('/', RestoController.getAllRestaurants);
-
+routerResto.get("/all", RestoController.getAllResto)
 // Get a single restaurant by ID
 routerResto.get('/:id', RestoController.getRestaurantById);
 

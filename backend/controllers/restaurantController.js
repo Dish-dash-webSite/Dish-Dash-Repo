@@ -1,5 +1,5 @@
 const { Op } = require('sequelize'); // Sequelize operators for filtering
-const { User, RestaurantOwner } = require('../database/associations');
+const { User, RestaurantOwner, Restaurant } = require('../database/associations');
 const MenuItem = require('../database/models/MenuItem');
 // const bcrypt = require('bcrypt');
 // const jwt = require('jsonwebtoken');
@@ -260,6 +260,15 @@ const RestoController = {
 
     //     }
     // }
+    getAllResto: async (req, res) => {
+        try {
+            const result = await Restaurant.findAll()
+            res.status(200).send(result)
+        } catch (err) {
+            res.status(400).send(err)
+            throw err
+        }
+    }
 
 
 };

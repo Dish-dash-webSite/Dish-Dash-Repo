@@ -36,12 +36,12 @@ const RestaurantList = () => {
           ...restaurant,
           image: restaurant.image || defaultImages[index % defaultImages.length]
         }));
-        
+
         // Initially show only restaurants with categories
         const restaurantsWithCategories = restaurantsWithImages.filter(
           restaurant => restaurant.cuisine
         );
-        
+
         setRestaurants(restaurantsWithImages);
         setFilteredRestaurants(restaurantsWithCategories);
       } catch (error) {
@@ -85,27 +85,24 @@ const RestaurantList = () => {
 
       <div className="mb-8 max-w-2xl mx-auto">
         <div className="flex space-x-4 mt-4 justify-center">
-          <button 
+          <button
             onClick={() => handleFilterClick('Italian')}
-            className={`px-6 py-2 ${
-              activeFilter === 'Italian' ? 'bg-orange-600' : 'bg-orange-500'
-            } text-white rounded-lg hover:bg-orange-600 transition shadow-sm`}
+            className={`px-6 py-2 ${activeFilter === 'Italian' ? 'bg-orange-600' : 'bg-orange-500'
+              } text-white rounded-lg hover:bg-orange-600 transition shadow-sm`}
           >
             Italian
           </button>
-          <button 
+          <button
             onClick={() => handleFilterClick('Mexican')}
-            className={`px-6 py-2 ${
-              activeFilter === 'Mexican' ? 'bg-orange-600' : 'bg-orange-500'
-            } text-white rounded-lg hover:bg-orange-600 transition shadow-sm`}
+            className={`px-6 py-2 ${activeFilter === 'Mexican' ? 'bg-orange-600' : 'bg-orange-500'
+              } text-white rounded-lg hover:bg-orange-600 transition shadow-sm`}
           >
             Mexican
           </button>
-          <button 
+          <button
             onClick={() => handleFilterClick('Asian')}
-            className={`px-6 py-2 ${
-              activeFilter === 'Asian' ? 'bg-orange-600' : 'bg-orange-500'
-            } text-white rounded-lg hover:bg-orange-600 transition shadow-sm`}
+            className={`px-6 py-2 ${activeFilter === 'Asian' ? 'bg-orange-600' : 'bg-orange-500'
+              } text-white rounded-lg hover:bg-orange-600 transition shadow-sm`}
           >
             Asian
           </button>
@@ -136,7 +133,7 @@ const RestaurantList = () => {
                   <span>{restaurant.location || 'Location not available'}</span>
                 </div>
                 <button
-                  onClick={() => {/* Add your navigation logic here */}}
+                  onClick={() => {/* Add your navigation logic here */ }}
                   className="text-orange-500 font-semibold hover:text-orange-600 flex items-center"
                 >
                   View Menu <span className="ml-2">→</span>

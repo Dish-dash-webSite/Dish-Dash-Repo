@@ -1,93 +1,120 @@
-// driverController.js
-
-const { Driver, User, Customer } = require('../database/associations');
-const bcrypt = require('bcryptjs');
+const { connection,User,Order, Driver } = require('../database/associations'); // Import your connection instance and Driver model
+const validator = require('validator')
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET || '1234';
-const expiresIn = '10h';
-const saltRounds = 10;
-const validator = require('validator'); 
 
-const register = async (req, res) => {
+const registerDriver = async (req, res) => {
+    const transaction = await connection.transaction(); // Start a transaction
     try {
-        const { firstName, lastName, email, password, phoneNumber, vehicleType, role, licenseNumber, deliveryAddress } = req.body;
+        const { firstName, lastName, vehicleType, licenseNumber } = req.body;
+        const userId = req.user.id; // Extract userId from middleware
 
-        // Check input fields
-        if (!firstName || !lastName || !email || !password || !phoneNumber || !vehicleType || !role || !licenseNumber || !deliveryAddress) {
-            return res.status(400).json({ error: "All fields are required" });
+        // Validation
+        if (!userId || !firstName || !lastName || !vehicleType || !licenseNumber) {
+            await transaction.rollback(); // Rollback transaction
+            return res.status(401).json({ message: 'All fields are required' });
+        }
+        if (!validator.isNumeric(userId.toString())) {
+            await transaction.rollback(); // Rollback transaction
+            return res.status(400).json({ message: 'User ID must be a number' });
+        }
+        if (!validator.isAlpha(firstName) || !validator.isAlpha(lastName)) {
+            await transaction.rollback(); // Rollback transaction
+            return res.status(400).json({ message: 'Names must contain only letters' });
+        }
+        if (validator.isEmpty(vehicleType)) {
+            await transaction.rollback(); // Rollback transaction
+            return res.status(402).json({ message: 'Vehicle type is required' });
+        }
+        if (!validator.isAlphanumeric(licenseNumber)) {
+            await transaction.rollback(); // Rollback transaction
+            return res.status(403).json({ message: 'License number must be alphanumeric' });
         }
 
-        if (!validator.isEmail(email)) {
-            return res.status(400).json({ error: "Invalid email format" });
+        // Check if the user is already registered as a driver
+        const existingDriver = await Driver.findOne({ where: { userId }, transaction });
+        if (existingDriver) {
+            await transaction.rollback(); // Rollback transaction
+            return res.status(400).json({ message: 'User is already registered as a driver' });
         }
 
-        // Validate phone number (e.g., ensure it's a valid mobile number)
-        if (!validator.isMobilePhone(phoneNumber, 'any', { strictMode: false })) {
-            return res.status(400).json({ error: "Invalid phone number" });
-        }
+        // Create a new driver
+        const newDriver = await Driver.create(
+            { userId, firstName, lastName, vehicleType, licenseNumber },
+            { transaction }
+        );
 
-        // Validate password length (example: at least 8 characters)
-        const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
-        if (!passwordRegex.test(password)) {
-            return res.status(400).json({
-                error: "Password must be at least 8 characters long, include at least one uppercase letter, and one special character."
-            });
-        }
+        // Update the driver's role
+        await Driver.update(
+            { role: 'driver' },
+            { where: { id: newDriver.id }, transaction }
+        );
 
+        // Generate a JWT token
+        const driverToken = jwt.sign(
+            { userId: newDriver.userId, driverId: newDriver.id },
+            "12345",
+            { expiresIn: '7d' }
+        );
 
-        const existingUser = await User.findOne({ where: { email } });
+        // Set the token in a cookie
+        res.cookie('auth_token', driverToken, {
+            httpOnly: true,
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
 
-        // Check if user already exists
-        if (existingUser) {
-            const checkDriver = await Driver.findOne({ where: { userId: existingUser.id } });
-            if (checkDriver) {
-                return res.status(400).json({ error: "User already has a driver account" });
-            }
+        // Commit the transaction
+        await transaction.commit();
 
-            const checkCustomer = await Customer.findOne({ where: { userId: existingUser.id } });
-            let newCustomer;
-            if (!checkCustomer) {
-                newCustomer = await Customer.create({ firstName, lastName, deliveryAddress, userId: existingUser.id });
-            } else {
-                newCustomer = await Customer.findOne({ where: { userId: existingUser.id } });
-            }
-
-            const newDriver = await Driver.create({ firstName, lastName, vehicleType, licenseNumber, userId: existingUser.id });
-
-            const token = jwt.sign(
-                { userId: existingUser.id, role: existingUser.role, driverId: newDriver.id, customerId: newCustomer.id },
-                JWT_SECRET,
-                { expiresIn }
-            );
-
-            return res.status(201).cookie("token", token, {
-                httpOnly: true,
-                sameSite: "strict",
-                maxAge: 10 * 24 * 60 * 60 * 1000,
-            }).json({ message: "Register successful", login: "Login successful" });
-        } else {
-            const hashedPassword = await bcrypt.hash(password, saltRounds);
-            const newUser = await User.create({ email, passwordHash: hashedPassword, phoneNumber, role });
-
-            const newDriver = await Driver.create({ firstName, lastName, vehicleType, licenseNumber, userId: newUser.id });
-            const newCustomer = await Customer.create({ firstName, lastName, deliveryAddress, userId: newUser.id });
-
-            const token = jwt.sign(
-                { userId: newUser.id, role: newUser.role, driverId: newDriver.id, customerId: newCustomer.id },
-                JWT_SECRET,
-                { expiresIn }
-            );
-
-            return res.status(201).cookie("token", token, {
-                httpOnly: true,
-                sameSite: "strict",
-                maxAge: 10 * 24 * 60 * 60 * 1000,
-            }).json({ message: "Register successful", login: "Login successful" });
-        }
-
-    } catch (err) {
-        res.status(500).json({ error: err.message || "Internal Server Error" });
+        // Return success response
+        return res.status(201).json({
+            message: 'Driver registered successfully',
+            driver: newDriver,
+        });
+    } catch (error) {
+        // Rollback the transaction in case of an error
+        await transaction.rollback();
+        console.error(error);
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
+const verifyDriver = async(req,res) =>{
+    const userId = req.user?.id;
+    try{
+        if (!userId) return res.status(401).json({ message: 'Unauthorized' });
+        const driver = await Driver.findOne({ where: { userId } });
+        if (!driver) return res.status(404).json({isDriver:false});
+       const currentDriver = await Driver.findOne({ where:{userId:userId}})
+       if (!currentDriver) return res.status(400).json({message: "something went wrong"})
+        res.status(200).json({isDriver:true, driver:driver});
+    
+} catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Internal server error' });
+}}
 
-module.exports = { register };
+const fetchData = async (req, res) => {
+    const userId = req.user.id;
+    try{
+        if (!userId) return res.status(401).json({ message: 'Unauthorized' });
+        const user = await User.findOne({ id: userId})
+        if (!user) return res.status(404).json({ message: 'Unauthorized' });
+        const currentDriver = await Driver.findOne({ where:{userId:userId}});
+        if (!currentDriver) return res.status(400).json({message: "something went wrong"})
+        const Delivered = await Order.findAll({ where:{status:'delivered',driverId:currentDriver.id}})
+        const available = await Order.findAll({ where:{status:'prepared',driverId:currentDriver.id}})
+        let number=0;
+        let numberOfDelivered = 0;
+        if(available){
+            number=available.length;
+        }
+        if(Delivered){
+            numberOfDelivered=Delivered.length;
+        }
+        res.status(200).json({isDriver:true, driver:currentDriver,balance:user.balance,Delivered:numberOfDelivered,available:number});
+    }catch(err){
+        console.error(err);
+        return res.status(500).json({ message: 'Internal server error' });  }
+    }
+
+
+module.exports = { registerDriver ,verifyDriver,fetchData};

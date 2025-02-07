@@ -61,7 +61,30 @@ export default {
   				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
   				border: 'hsl(var(--sidebar-border))',
   				ring: 'hsl(var(--sidebar-ring))'
-  			}
+  			},      animation: {
+				'spin-slow': 'spin 3s linear infinite',
+				'ping-slow': 'ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite',
+				'bounce': 'bounce 1s infinite',
+				'fade-in': 'fadeIn 0.5s ease-in-out',
+			  },
+			  keyframes: {
+				spin: {
+				  '0%': { transform: 'rotate(0deg)' },
+				  '100%': { transform: 'rotate(360deg)' },
+				},
+				ping: {
+				  '75%, 100%': { transform: 'scale(1.5)', opacity: '0' },
+				},
+				bounce: {
+				  '0%, 100%': { transform: 'translateY(0)' },
+				  '50%': { transform: 'translateY(-10px)' },
+				},
+				fadeIn: {
+				  '0%': { opacity: '0' },
+				  '100%': { opacity: '1' },
+				},
+			  },
+		
   		}
   	}
   },

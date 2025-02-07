@@ -11,6 +11,9 @@ export interface User {
   updatedAt: string;
 }
 
+export interface VerifyDriverResponse {
+  data: string;
+}
 // Used for signing up a new user
 export interface UserSignup {
   email: string;
@@ -90,13 +93,13 @@ export const ADD_RESTAURANT = 'ADD_RESTAURANT';
 export type ActionTypes =
   | { type: typeof ADD_RESTAURANT; payload: Restaurant }
 
-export interface Restaurant {
-  idy: number;
-  name: string;
-  cuisine: string;
-  address: string;
-  rating: number;
-  contactNumber: string;
-  openingTime: string;
-  closingTime: string;
-}
+// export interface Restaurant {
+//   idy: number;
+//   name: string;
+//   cuisine: string;
+//   address: string;
+//   rating: number;
+//   contactNumber: string;
+//   openingTime: string;
+//   closingTime: string;
+// }

@@ -31,6 +31,11 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: DataTypes.NOW,
       },
+      balance: {
+        type: DataTypes.FLOAT,
+        defaultValue: 0,
+        allowNull: false,
+      },
       updatedAt: {
         type: DataTypes.DATE,
         allowNull: false,

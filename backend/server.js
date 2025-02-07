@@ -11,20 +11,23 @@ const db = require("./database/connection.js");
 const adminRoutes = require("./routes/adminRoutes");
 const userRoutes = require("./routes/userRoutes");
 const DriverRouter= require("./routes/driverRoutes.js");
+const messageRoutes = require('./routes/messageRoutes');
+const { Conversation, Message } = require('./database/associations');
 
 
 const app = express();
 const httpServer = createServer(app);
+// const allowedOrigins = ['http://localhost:5173', 'http://localhost:5181'];
 
 // Update CORS configuration
-const allowedOrigins = ['http://localhost:5173','http://localhost:5174', 'http://localhost:5181'];
+const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5181'];
 
 app.use(cors({
   origin: function (origin, callback) {
     if (allowedOrigins.includes(origin) || !origin) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error("Not allowed by CORS"));
     }
   },
   credentials: true
@@ -42,39 +45,79 @@ const io = new Server(httpServer, {
   pingInterval: 25000
 });
 
-const socketController = new SocketController(io);
-
+// Simple socket event handlers with console.logs
 io.on('connection', (socket) => {
-  socketController.handleConnection(socket);
+  console.log('Client connected:', socket.id);
+
+  socket.on('start-conversation', async (data) => {
+    try {
+      const [conversation] = await Conversation.findOrCreate({
+        where: {
+          customerId: data.customerId,
+          driverId: data.driverId,
+          orderId: data.orderId
+        },
+        include: [{
+          model: Message,
+          order: [['createdAt', 'ASC']]
+        }]
+      });
+
+      socket.emit('conversation-started', {
+        conversationId: conversation.id,
+        messages: conversation.Messages || []
+      });
+    } catch (error) {
+      console.error('Error creating conversation:', error);
+      socket.emit('conversation-error', error.message);
+    }
+  });
+
+  socket.on('send-chat-message', async (data) => {
+    try {
+      const message = await Message.create({
+        content: data.content,
+        senderId: data.senderId,
+        senderType: data.senderType,
+        conversationId: data.conversationId
+      });
+
+      io.emit('chat-message', {
+        ...message.toJSON(),
+        timestamp: new Date()
+      });
+    } catch (error) {
+      console.error('Error saving message:', error);
+      socket.emit('message-error', error.message);
+    }
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected:', socket.id);
+  });
 });
 
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true })); 
 app.use(cookieParser());
 
-// Use user routes
+// Use routes
 app.use('/api/users', userRoutes);
-
-app.use("/api/resto", RestoRoter); // Add cookie parser
-
-// Routes
+app.use("/api/resto", RestoRoter);
 app.use('/api/admin', adminRoutes);
 app.use('/api/driver', DriverRouter);
-// ✅ Middleware
-// ✅ CORS Configuration for Cookies
+app.use('/api/messages', messageRoutes);
 
-
-// ✅ Error Handling Middleware
+// Error Handling Middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
-
   res.status(500).json({
     success: false,
     message: "Internal Server Error",
   });
 });
 
-// ✅ Start Server
+// Start Server
 httpServer.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });

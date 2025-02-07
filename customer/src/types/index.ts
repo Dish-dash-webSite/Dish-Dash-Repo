@@ -11,6 +11,9 @@ export interface User {
   updatedAt: string;
 }
 
+export interface VerifyDriverResponse {
+  data: string;
+}
 // Used for signing up a new user
 export interface UserSignup {
   email: string;

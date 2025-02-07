@@ -121,7 +121,7 @@ const SocketTest: React.FC = () => {
     console.log('Starting conversation...');
     socket.emit('start-conversation', {
       customerId: 1,
-      driverId: 99999,
+      driverId: 1,
       orderId: 1
     });
   };
@@ -175,30 +175,8 @@ const SocketTest: React.FC = () => {
     };
 
     console.log('Sending message data:', messageData);
-    
-    // Add error handling for emit
-    try {
-      socket.emit('send-chat-message', messageData, (error: any, response: any) => {
-        if (error) {
-          console.error('Error sending message:', error);
-        } else {
-          console.log('Message sent successfully:', response);
-        }
-      });
-
-      // Add message to local state immediately
-      const newMsg = {
-        ...messageData,
-        timestamp: new Date(),
-        id: Date.now() // temporary ID
-      };
-      console.log('Adding message to local state:', newMsg);
-      setMessages(prev => [...prev, newMsg]);
-      
-      setNewMessage('');
-    } catch (error) {
-      console.error('Error in socket emit:', error);
-    }
+    socket.emit('send-chat-message', messageData);
+    setNewMessage('');
   };
 
   // Add socket event listener for message errors
@@ -243,6 +221,14 @@ const SocketTest: React.FC = () => {
     setRole(currentRole => currentRole === 'customer' ? 'driver' : 'customer');
   };
 
+  // Add clearChat function
+  const clearChat = () => {
+    setMessages([]);
+    setConversationId(null);
+    setNewMessage('');
+    console.log('Chat cleared');
+  };
+
   return (
     <div className="p-4 max-w-md mx-auto">
       {/* Add Role Toggle Button at the top */}
@@ -270,14 +256,25 @@ const SocketTest: React.FC = () => {
       </div>
 
       {/* Start Conversation Button */}
-      {!conversationId && connected && (
-        <button
-          onClick={startConversation}
-          className="w-full bg-green-500 text-white px-4 py-2 rounded mb-4"
-        >
-          Start Conversation
-        </button>
-      )}
+      <div className="flex justify-between mb-4">
+        {!conversationId && connected && (
+          <button
+            onClick={startConversation}
+            className="bg-green-500 text-white px-4 py-2 rounded"
+          >
+            Start Conversation
+          </button>
+        )}
+        
+        {conversationId && (
+          <button
+            onClick={clearChat}
+            className="bg-red-500 text-white px-4 py-2 rounded"
+          >
+            End Chat
+          </button>
+        )}
+      </div>
 
       {/* Messages Display */}
       <div className="border rounded-lg h-96 mb-4 overflow-y-auto p-4 bg-gray-50">

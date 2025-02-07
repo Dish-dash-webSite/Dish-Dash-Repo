@@ -16,12 +16,27 @@ const DriverRouter= require("./routes/driverRoutes.js");
 const app = express();
 const httpServer = createServer(app);
 
+// Update CORS configuration
+const allowedOrigins = ['http://localhost:5173','http://localhost:5174', 'http://localhost:5181'];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
+
+// Socket.IO setup with CORS
 const io = new Server(httpServer, {
   cors: {
-    origin: ['http://localhost:5173', 'http://localhost:5181'],
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true,
-    transports: ['websocket', 'polling']
+    allowedHeaders: ["my-custom-header"],
   },
   pingTimeout: 60000,
   pingInterval: 25000
@@ -36,8 +51,6 @@ io.on('connection', (socket) => {
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true })); 
 app.use(cookieParser());
-
-// app.use(cors());
 
 // Use user routes
 app.use('/api/users', userRoutes);

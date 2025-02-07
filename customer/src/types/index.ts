@@ -85,3 +85,18 @@ export interface Category {
   image: string;
   restaurantCount: number;
 }
+export const ADD_RESTAURANT = 'ADD_RESTAURANT';
+
+export type ActionTypes =
+  | { type: typeof ADD_RESTAURANT; payload: Restaurant }
+
+export interface Restaurant {
+  idy: number;
+  name: string;
+  cuisine: string;
+  address: string;
+  rating: number;
+  contactNumber: string;
+  openingTime: string;
+  closingTime: string;
+}

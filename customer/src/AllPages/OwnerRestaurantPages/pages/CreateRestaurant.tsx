@@ -1,5 +1,8 @@
 import { useState, ChangeEvent, FormEvent } from 'react';
-import Flag from 'react-world-flags'; // Import the Flag component
+import Flag from 'react-world-flags';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../../../store/index'; // Ensure this is exported from your store
+import { addRestaurant } from '../../../store/restaurantsSlice';
 
 interface RestaurantFormData {
     name: string;
@@ -10,6 +13,10 @@ interface RestaurantFormData {
     openingTime: string;
     closingTime: string;
 }
+
+type FormErrors = {
+    [K in keyof RestaurantFormData]?: string;
+};
 
 const RestaurantForm: React.FC = () => {
     const [formData, setFormData] = useState<RestaurantFormData>({
@@ -22,9 +29,9 @@ const RestaurantForm: React.FC = () => {
         closingTime: '',
     });
 
-    const [formErrors, setFormErrors] = useState<Partial<RestaurantFormData>>({});
+    const [formErrors, setFormErrors] = useState<FormErrors>({});
+    const dispatch = useDispatch<AppDispatch>();
 
-    // Handle input changes dynamically
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
         const { name, value } = e.target;
         setFormData((prevData) => ({
@@ -32,7 +39,6 @@ const RestaurantForm: React.FC = () => {
             [name]: value,
         }));
 
-        // Clear error if field is corrected
         setFormErrors((prevErrors) => ({
             ...prevErrors,
             [name]: '',
@@ -41,24 +47,24 @@ const RestaurantForm: React.FC = () => {
 
     const validateForm = (): boolean => {
         let isValid = true;
-        const errors: Partial<RestaurantFormData> = {};
+        const errors: FormErrors = {};
 
-        if (!formData.name) {
+        if (!formData.name.trim()) {
             errors.name = 'Restaurant name is required';
             isValid = false;
         }
 
-        if (!formData.cuisine) {
+        if (!formData.cuisine.trim()) {
             errors.cuisine = 'Cuisine is required';
             isValid = false;
         }
 
-        if (!formData.address) {
+        if (!formData.address.trim()) {
             errors.address = 'Address is required';
             isValid = false;
         }
 
-        if (!formData.contactNumber) {
+        if (!formData.contactNumber.trim()) {
             errors.contactNumber = 'Contact number is required';
             isValid = false;
         }
@@ -66,9 +72,7 @@ const RestaurantForm: React.FC = () => {
         if (!formData.openingTime || !formData.closingTime) {
             errors.openingTime = 'Both opening and closing times are required';
             isValid = false;
-        }
-
-        if (formData.openingTime >= formData.closingTime) {
+        } else if (formData.openingTime >= formData.closingTime) {
             errors.openingTime = 'Opening time must be earlier than closing time';
             isValid = false;
         }
@@ -77,14 +81,27 @@ const RestaurantForm: React.FC = () => {
         return isValid;
     };
 
-    const handleSubmit = (e: FormEvent): void => {
+    const handleSubmit = async (e: FormEvent): Promise<void> => {
         e.preventDefault();
 
         if (!validateForm()) return;
 
-        // Handle form submission (e.g., call an API)
-        console.log('Restaurant Information:', formData);
-    };
+        try {
+            // await dispatch(addRestaurant(formData)).unwrap();
+            alert('Restaurant created successfully!');
+            setFormData({
+                name: '',
+                cuisine: '',
+                address: '',
+                rating: 1,
+                contactNumber: '',
+                openingTime: '',
+                closingTime: '',
+            });
+        } catch (error) {
+            alert('Failed to create restaurant. Please try again.');
+        }
+    }
 
     return (
         <div className="flex min-h-screen bg-cover bg-center" style={{ backgroundImage: 'url(https://images.pexels.com/photos/30500761/pexels-photo-30500761.jpeg)' }}>
@@ -187,24 +204,6 @@ const RestaurantForm: React.FC = () => {
                                 />
                                 {formErrors.closingTime && <p className="text-red-500 text-sm">{formErrors.closingTime}</p>}
                             </div>
-                        </div>
-
-                        {/* Rating with Stars */}
-                        <div className="mb-6">
-                            <label htmlFor="rating" className="block text-sm font-medium text-gray-700">Rating</label>
-                            <div className="flex space-x-1">
-                                {[1, 2, 3, 4, 5].map((star) => (
-                                    <button
-                                        key={star}
-                                        type="button"
-                                        onClick={() => setFormData((prevData) => ({ ...prevData, rating: star }))}
-                                        className={`text-2xl ${formData.rating >= star ? 'text-yellow-500' : 'text-gray-300'}`}
-                                    >
-                                        &#9733;
-                                    </button>
-                                ))}
-                            </div>
-                            {formErrors.rating && <p className="text-red-500 text-sm">{formErrors.rating}</p>}
                         </div>
 
                         {/* Submit Button */}

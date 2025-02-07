@@ -7,7 +7,7 @@ const port = 3000;
 const db = require("./database/connection.js");
 const adminRoutes = require("./routes/adminRoutes");
 const userRoutes = require("./routes/userRoutes");
-
+const ownerRestoRoute = require("./routes/restaurantOwner.js")
 
 const app = express();
 const allowedOrigins = ['http://localhost:5173', 'http://localhost:5181'];
@@ -24,8 +24,8 @@ app.use(cors({
   credentials: true,  // If you're using cookies
 }))
 
-app.use(express.json()); 
-app.use(express.urlencoded({ extended: true })); 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // app.use(cors());
@@ -37,6 +37,7 @@ app.use("/api/resto", RestoRoter); // Add cookie parser
 
 // Routes
 app.use('/api/admin', adminRoutes);
+app.use("/api/owner", ownerRestoRoute)
 // app.use('/api/driver', DriverRouter);
 // ✅ Middleware
 // ✅ CORS Configuration for Cookies

@@ -1,5 +1,6 @@
 const { Op } = require('sequelize'); // Sequelize operators for filtering
 const { User, RestaurantOwner } = require('../database/associations');
+const MenuItem = require('../database/models/MenuItem');
 // const bcrypt = require('bcrypt');
 // const jwt = require('jsonwebtoken');
 
@@ -176,7 +177,7 @@ const RestoController = {
             console.log("err", err)
             res.status(404).send(err)
         }
-    },deleteRestaurant : async (req, res) => {
+    }, deleteRestaurant: async (req, res) => {
         try {
             const restaurant = await RestaurantOwner.findByPk(req.params.id);
             if (!restaurant) {
@@ -190,7 +191,7 @@ const RestoController = {
             res.status(500).json({ error: 'Internal Server Error' });
         }
     },
-    updateRestaurant : async (req, res) => {
+    updateRestaurant: async (req, res) => {
         try {
             const restaurant = await RestaurantOwner.findByPk(req.params.id);
             if (!restaurant) {
@@ -204,7 +205,7 @@ const RestoController = {
             res.status(500).json({ error: 'Internal Server Error' });
         }
     },
-    getRestaurantById : async (req, res) => {
+    getRestaurantById: async (req, res) => {
         try {
             const restaurant = await RestaurantOwner.findByPk(req.params.id);
             if (!restaurant) {
@@ -217,44 +218,53 @@ const RestoController = {
             res.status(500).json({ error: 'Internal Server Error' });
         }
     },
-    getAllRestaurants : async (req, res) => {
+    getAllRestaurants: async (req, res) => {
         try {
             const { rating, cuisineType, name } = req.query;
             let filter = {};
-    
+
             // Filter by rating (minimum rating)
             if (rating) {
                 filter.rating = { [Op.gte]: parseFloat(rating) };
             }
-    
+
             // Filter by cuisine type (case-insensitive)
             if (cuisineType) {
                 filter.cuisineType = { [Op.iLike]: `%${cuisineType}%` };
             }
-    
+
             // Search by name (case-insensitive)
             if (name) {
                 filter.name = { [Op.iLike]: `%${name}%` };
             }
-    
+
             // Fetch restaurants with filtering
             const restaurants = await RestaurantOwner.findAll({
                 where: filter,
                 attributes: ['id', 'name', 'address', 'cuisineType', 'contactNumber', 'operatingHours', 'rating'], // Only return necessary fields
             });
 
-    
+
             res.status(200).json(restaurants);
         } catch (error) {
             console.error('Error fetching restaurants:', error);
             res.status(500).json({ error: 'Internal Server Error' });
         }
-    }
-    
+    },
+    // getAllItems: async (req, res) => {
+    //     const { id } = req.params
+    //     try {
+    //         const allItems = await MenuItem.findAll({ where: { restaurantId: id } })
+    //         res.status(200).send(allItems)
+    //     } catch (err) {
+
+    //     }
+    // }
+
 
 };
 
-module.exports = RestoController; 
+module.exports = RestoController;
 // Get a single restaurant by ID
 // Create a new restaurant
 // exports.createRestaurant = async (req, res) => {

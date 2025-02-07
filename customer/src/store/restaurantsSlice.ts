@@ -1,100 +1,61 @@
-import { createSlice } from '@reduxjs/toolkit';
-import type { Restaurant, Category } from '../types';
+// src/store/restaurantSlice.ts
 
-interface RestaurantsState {
-  featuredRestaurants: Restaurant[];
-  categories: Category[];
-  popularRestaurants: Restaurant[];
+import { createSlice } from '@reduxjs/toolkit';
+import { Restaurant } from '../types';
+import { createAsyncThunk } from '@reduxjs/toolkit'
+import axios from 'axios';
+
+export const addRestaurant = createAsyncThunk(
+  'restaurants/addRestaurant',
+  async (restaurantData: Restaurant, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`http://localhost:3000/api/resto/create`, restaurantData);
+      return response.data; // Return restaurant data after successful creation
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to add restaurant');
+    }
+  }
+)
+
+interface RestaurantState {
+  restaurants: Restaurant[]; // List of restaurants
+  loading: boolean;
+  error: string | null;
 }
 
-const initialState: RestaurantsState = {
-  featuredRestaurants: [
-    {
-      id: '1',
-      name: 'Chef Burgers London',
-      image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-      discount: 40,
-      type: 'Restaurant'
-    },
-    {
-      id: '2',
-      name: 'Grand AI Cafe London',
-      image: 'https://images.unsplash.com/photo-1564759298141-cef86f51d4d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-      discount: 20,
-      type: 'Restaurant'
-    },
-    {
-      id: '3',
-      name: 'Butterbrot Caf\'e London',
-      image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-      discount: 17,
-      type: 'Restaurant'
-    }
-  ],
-  categories: [
-    {
-      id: '1',
-      name: 'Burgers & Fast food',
-      image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-      restaurantCount: 21
-    },
-    {
-      id: '2',
-      name: 'Salads',
-      image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-      restaurantCount: 32
-    },
-    {
-      id: '3',
-      name: 'Pasta & Casuals',
-      image: 'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-      restaurantCount: 4
-    },
-    {
-      id: '4',
-      name: 'Pizza',
-      image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-      restaurantCount: 39
-    },
-    {
-      id: '5',
-      name: 'Breakfast',
-      image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-      restaurantCount: 4
-    },
-    {
-      id: '6',
-      name: 'Soups',
-      image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-      restaurantCount: 32
-    }
-  ],
-  popularRestaurants: [
-    {
-      id: 'mcdonalds',
-      name: 'McDonald\'s London',
-      image: 'https://images.unsplash.com/photo-1619881590738-a111d176d906?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-      type: 'Fast Food'
-    },
-    {
-      id: 'papajohns',
-      name: 'Papa Johns',
-      image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-      type: 'Pizza'
-    },
-    {
-      id: 'kfc',
-      name: 'KFC West London',
-      image: 'https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-      type: 'Fast Food'
-    }
-  ]
+const initialState: RestaurantState = {
+  restaurants: [],
+  loading: false,
+  error: null,
 };
 
-export const restaurantsSlice = createSlice({
+const restaurantSlice = createSlice({
   name: 'restaurants',
   initialState,
-  reducers: {}
+  reducers: {
+    clearError: (state) => {
+      state.error = null;
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      // Add Restaurant - Pending state
+      .addCase(addRestaurant.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      // Add Restaurant - Fulfilled state
+      .addCase(addRestaurant.fulfilled, (state, action) => {
+        state.loading = false;
+        state.restaurants.push(action.payload); // Add new restaurant to the list
+      })
+      // Add Restaurant - Rejected state
+      .addCase(addRestaurant.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string; // Set error if the request fails
+      });
+  },
 });
 
-export default restaurantsSlice.reducer;
+export const { clearError } = restaurantSlice.actions;
+export default restaurantSlice.reducer;

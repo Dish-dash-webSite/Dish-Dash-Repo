@@ -7,7 +7,9 @@ import FeaturedRestaurants from "../components/FeaturedRestaurants";
 import Categories from "../components/Categories";
 import PopularRestaurants from "../components/PopularRestaurants";
 import RestaurantMap from "../components/RestaurantMap";
-const  Homepage =()=> {
+import TestPage from './TestPage';
+
+const Homepage =()=> {
   return (
     <div>
 
@@ -22,6 +24,7 @@ const  Homepage =()=> {
       </div>
         {/* //<RestaurantList/> */}
         <RestaurantMap/>
+        <TestPage/>
         <Footer />
     </div>
   )

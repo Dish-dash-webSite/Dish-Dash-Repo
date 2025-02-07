@@ -98,3 +98,9 @@ export interface Restaurant {
   imageUrl?: string; // Optional if you have images
 }
 
+interface DriverLocation {
+  lat: number;
+  lng: number;
+  driverId: string;
+  orderId: string;
+}

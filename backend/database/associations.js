@@ -101,4 +101,6 @@ module.exports = {
   GeoLocation,
   Media,
   RestaurantOwner,
+  Conversation,
+  Message
 };

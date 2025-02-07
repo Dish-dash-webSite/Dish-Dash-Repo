@@ -1,10 +1,18 @@
 import React from 'react';
-
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
 interface NavbarProps {
   toggleSidebar: () => void;
 }
 
 const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
+
+
+  const driver = useSelector((state) => state.dashboard.driver);
+
+  useEffect(() => {
+    console.log("firstName", driver);
+  }, [driver]); 
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white p-4 flex justify-between items-center shadow-lg z-40 overflow-hidden">
       {/* Left Side: Toggle Button and Circle */}
@@ -36,7 +44,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
       <div className="flex items-center space-x-4 relative">
         {/* Circle on the Left of the Dashboard Text */}
         <div className="w-4 h-4 bg-[#028643] rounded-full opacity-30 absolute -left-6 animate-pulse"></div>
-        <span className="text-lg font-semibold text-[#03081F]">Dashboard</span>
+        <span className="text-lg font-semibold text-[#03081F]">{driver.firstName + " "+driver.lastName }</span>
         <img
           src="https://cdn.discordapp.com/attachments/1291763293253406832/1291812993738215568/F610CFEB-E0C1-49A7-8AA2-EF016A0E45C2.jpg?ex=67a4f01a&is=67a39e9a&hm=51b137fe9edb55c92b6f3533d299e9eee61c759397300ef8c898327bcba5ce5f&"
           alt="Profile"

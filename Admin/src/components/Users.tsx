@@ -5,7 +5,7 @@ import { fetchUsers } from '../features/users/usersSlice';
 const Users: React.FC = () => {
     const dispatch = useAppDispatch();
     const { users, status, error } = useAppSelector((state) => state.users);
-
+    console.log('users',users)
     useEffect(() => {
         if (status === 'idle') {
             dispatch(fetchUsers());

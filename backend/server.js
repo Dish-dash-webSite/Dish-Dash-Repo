@@ -11,19 +11,30 @@ const DriverRouter= require("./routes/driverRoutes.js");
 
 
 const app = express();
-const allowedOrigins = ['http://localhost:5173', 'http://localhost:5181'];
+// const allowedOrigins = ['http://localhost:5173', 'http://localhost:5181'];
 
 
+// app.use(cors({
+//   origin: function ("origin", callback) {
+//     if (allowedOrigins.includes(origin) || !origin) { // for requests without origin (e.g. Postman)
+//       callback(null, true);
+//     } else {
+//       callback(new Error('Not allowed by CORS'));
+//     }
+//   },
+//   credentials: true,  // If you're using cookies
+// }))
 app.use(cors({
   origin: function (origin, callback) {
-    if (allowedOrigins.includes(origin) || !origin) { // for requests without origin (e.g. Postman)
+    if (!origin || /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error("Not allowed by CORS"));
     }
   },
-  credentials: true,  // If you're using cookies
-}))
+  credentials: true, // Allow cookies/auth
+}));
+
 
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true })); 

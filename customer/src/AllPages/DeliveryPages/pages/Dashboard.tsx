@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import Navbar from '../component/Navbar';
 import Sidebar from '../component/Sidebar';
 import MainContent from '../component/MainContent';
@@ -14,6 +14,15 @@ const Dashboard: React.FC = () => {
   const closeSidebar = () => {
     setIsSidebarOpen(false);
   };
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [selectedMenuItem]);
+
+
+  
+
+
+
 
   // Function to handle menu item clicks
   const handleMenuItemClick = (menuItem: string) => {
@@ -29,7 +38,7 @@ const Dashboard: React.FC = () => {
         closeSidebar={closeSidebar}
         onMenuItemClick={handleMenuItemClick} // Pass the callback to handle menu item clicks
       />
-      <MainContent selectedMenuItem={selectedMenuItem} /> {/* Pass the selected menu item to MainContent */}
+      <MainContent selectedMenuItem={selectedMenuItem} /> 
     </div>
   );
 };

@@ -84,9 +84,9 @@ Conversation.hasMany(Message, { foreignKey: 'conversationId', onDelete: 'CASCADE
 Message.belongsTo(Conversation, { foreignKey: 'conversationId' });
 
 // Sync all models with the database
-// connection.sync({ alter: true }).then(() => {
-//   console.log('Database & tables created!');
-// });
+connection.sync({ alter: true }).then(() => {
+  console.log('Database & tables created!');
+});
 
 
 module.exports = {
@@ -101,5 +101,7 @@ module.exports = {
   GeoLocation,
   Media,
   RestaurantOwner,
+  Conversation,
+  Message,
   connection,
 };

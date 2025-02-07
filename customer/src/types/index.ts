@@ -88,3 +88,22 @@ export interface Category {
   image: string;
   restaurantCount: number;
 }
+export interface Restaurant {
+  id: string;
+  name: string;
+  address: string;
+  cuisineType: string;
+  contactNumber: string;
+  openingH: string;
+
+  closingH: string;
+  rating: number;
+  imageUrl?: string; // Optional if you have images
+}
+
+interface DriverLocation {
+  lat: number;
+  lng: number;
+  driverId: string;
+  orderId: string;
+}

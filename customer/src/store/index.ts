@@ -3,6 +3,8 @@ import authReducer from "./authSlices";
 import restaurantsReducer from "./restaurantsSlice";
 import driverReducer from "./driverSlice";
 import dashboardReducer from "./dashboardSlice";
+import dashboardReducer from "./dashboardSlice";
+import categoriesReducer from './categoriesSlice';
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +12,8 @@ export const store = configureStore({
     restaurants: restaurantsReducer,
     driver: driverReducer,
     dashboard: dashboardReducer,
+    dashboard: dashboardReducer,
+    categories: categoriesReducer,
   },
 });
 

@@ -15,11 +15,14 @@ const validateLogin = require('../middlewares/restoOwner');
 
 // Import controller
 
-// Get all restaurants
-routerResto.get('/', RestoController.getAllRestaurants);
-routerResto.get("/all", RestoController.getAllResto)
+// Get popular restaurants - PUT THIS FIRST
+routerResto.get('/popular', RestoController.getPopularRestaurants);
+
 // Get a single restaurant by ID
 routerResto.get('/:id', RestoController.getRestaurantById);
+
+// Get all restaurants
+routerResto.get('/', RestoController.getAllRestaurants);
 
 // Create a new restaurant
 // router.post('/', RestoController.CrateRestaurant);
@@ -31,7 +34,6 @@ routerResto.put('/:id', RestoController.updateRestaurant);
 
 // Delete a restaurant
 routerResto.delete('/:id', RestoController.deleteRestaurant);
-
 
 module.exports = routerResto;
 

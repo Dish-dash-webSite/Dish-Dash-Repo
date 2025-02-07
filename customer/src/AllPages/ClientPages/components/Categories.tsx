@@ -1,31 +1,36 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from '../../../store';
+import { AppDispatch } from '../../../store';
+import { fetchCategories } from '../../../store/categoryThunks';
+
+interface Category {
+  id: number;
+  name: string;
+}
 
 const Categories: React.FC = () => {
-  const categories = useSelector((state: RootState) => state.restaurants.categories);
+  const dispatch = useDispatch<AppDispatch>();
+  const categories = useSelector((state: RootState) => state.categories?.items ?? []);
+
+  useEffect(() => {
+    dispatch(fetchCategories());
+  }, [dispatch]);
+
+  if (!Array.isArray(categories)) {
+    console.error('Categories is not an array:', categories);
+    return null;
+  }
 
   return (
-    <section className="py-8 bg-gray-50">
+    <section className="py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-2xl font-bold mb-6">Order.uk Popular Categories 😋</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <h2 className="text-2xl font-bold mb-6">Categories</h2>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {categories.map((category) => (
-            <a
-              key={category.id}
-              href="#"
-              className="bg-white rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow duration-300"
-            >
-              <img
-                src={category.image}
-                alt={category.name}
-                className="w-full h-32 object-cover"
-              />
-              <div className="p-4">
-                <h3 className="font-semibold text-sm">{category.name}</h3>
-                <p className="text-sm text-gray-600 mt-1">{category.restaurantCount} Restaurants</p>
-              </div>
-            </a>
+            <div key={category.id} className="bg-white rounded-lg shadow-md p-4">
+              <h3 className="text-lg font-semibold">{category.name}</h3>
+            </div>
           ))}
         </div>
       </div>

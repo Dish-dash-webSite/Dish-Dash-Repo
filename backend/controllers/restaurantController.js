@@ -1,6 +1,5 @@
 const { Op } = require('sequelize'); // Sequelize operators for filtering
-const { User, RestaurantOwner, Restaurant } = require('../database/associations');
-const MenuItem = require('../database/models/MenuItem');
+const { User, Restaurant, RestaurantOwner, sequelize } = require('../database/associations');
 // const bcrypt = require('bcrypt');
 // const jwt = require('jsonwebtoken');
 
@@ -86,7 +85,6 @@ const RestoController = {
     //             message: 'Internal server error',
     //             error: 'development' ? error.message : undefined
     //         });
-    //     }
     // },
 
 
@@ -245,32 +243,27 @@ const RestoController = {
             });
 
 
+            const restaurants = await Restaurant.findAll();
             res.status(200).json(restaurants);
         } catch (error) {
             console.error('Error fetching restaurants:', error);
             res.status(500).json({ error: 'Internal Server Error' });
         }
     },
-    // getAllItems: async (req, res) => {
-    //     const { id } = req.params
-    //     try {
-    //         const allItems = await MenuItem.findAll({ where: { restaurantId: id } })
-    //         res.status(200).send(allItems)
-    //     } catch (err) {
-
-    //     }
-    // }
-    getAllResto: async (req, res) => {
+    getPopularRestaurants: async (req, res) => {
         try {
-            const result = await Restaurant.findAll()
-            res.status(200).send(result)
-        } catch (err) {
-            res.status(400).send(err)
-            throw err
+            const restaurants = await Restaurant.findAll({
+                order: [['rating', 'DESC']],
+                limit: 10
+            });
+
+            res.header('Content-Type', 'application/json');
+            res.json(restaurants);
+        } catch (error) {
+            console.error('Error:', error);
+            res.status(500).json({ error: error.message });
         }
     }
-
-
 };
 
 module.exports = RestoController;

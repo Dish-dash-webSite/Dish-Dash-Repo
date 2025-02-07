@@ -8,23 +8,25 @@ const db = require("./database/connection.js");
 const adminRoutes = require("./routes/adminRoutes");
 const userRoutes = require("./routes/userRoutes");
 const DriverRouter= require("./routes/driverRoutes.js");
+const categoryRoutes = require("./routes/categorieRoutes.js");
 
 
 const app = express();
-const allowedOrigins = ['http://localhost:5173', 'http://localhost:5181'];
+// const allowedOrigins = ['http://localhost:5174', 'https://your-production-domain.com'];
 
+const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174'];
 
 app.use(cors({
-  origin: function (origin, callback) {
-    if (allowedOrigins.includes(origin) || !origin) { // for requests without origin (e.g. Postman)
-      callback(null, true);
+  origin: (origin, callback) => {
+    // If origin is not provided (during a preflight request), it can be null
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);  // Allow the request
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error('Not allowed by CORS'));  // Reject the request
     }
   },
-  credentials: true,  // If you're using cookies
-}))
-
+  credentials: true  // Allow credentials (cookies, headers)
+}));
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true })); 
 app.use(cookieParser());
@@ -39,6 +41,7 @@ app.use("/api/resto", RestoRoter); // Add cookie parser
 // Routes
 app.use('/api/admin', adminRoutes);
 app.use('/api/driver', DriverRouter);
+app.use('/api/category', categoryRoutes);
 // ✅ Middleware
 // ✅ CORS Configuration for Cookies
 
@@ -58,3 +61,13 @@ app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
 
+// {
+//   origin: function (origin, callback) {
+//     if (allowedOrigins.includes(origin) || !origin) {
+//       callback(null, true); // Allow the request
+//     } else {
+//       callback(new Error('Not allowed by CORS')); // Block the request
+//     }
+//   },
+//   credentials: true, // If you're using cookies or authentication
+// })

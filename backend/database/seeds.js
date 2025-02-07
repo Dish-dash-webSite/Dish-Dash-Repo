@@ -259,11 +259,11 @@ const seedsRestaurantOwner = async () => {
   }
 }
 
-seedUser()
-seedCustomer()
-seedsRestaurantOwner()
+// seedUser()
+// seedCustomer()
+// seedsRestaurantOwner()
 seedsRestaurant()
-seedDriver()
-seedCategory()
-seedGeolocation()
-seedMenuItem()
+// seedDriver()
+// seedCategory()
+// seedGeolocation()
+// seedMenuItem()

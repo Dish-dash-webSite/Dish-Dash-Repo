@@ -241,9 +241,6 @@ const RestoController = {
                 where: filter,
                 attributes: ['id', 'name', 'address', 'cuisineType', 'contactNumber', 'operatingHours', 'rating'], // Only return necessary fields
             });
-
-
-            const restaurants = await Restaurant.findAll();
             res.status(200).json(restaurants);
         } catch (error) {
             console.error('Error fetching restaurants:', error);

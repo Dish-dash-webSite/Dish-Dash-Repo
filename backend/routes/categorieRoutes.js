@@ -18,6 +18,6 @@ router.put('/:id', categoryController.updateCategory);
 router.delete('/:id', categoryController.deleteCategory);
 
 // Search categories by name and cuisineType
-router.get('/search', categoryController.searchCategoriesByName);
+
 
 module.exports = router;

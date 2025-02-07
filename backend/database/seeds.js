@@ -17,29 +17,13 @@ const seedUser = async () => {
   try {
     const users = [
       {
-        email: 'customer@example.com',
-        passwordHash: await bcrypt.hash('password123', saltRounds),
+        email: 'FahmiNjjari@example.com',
+        passwordHash: await bcrypt.hash('Test123$', saltRounds),
         role: 'customer',
         phoneNumber: '1234567890',
         createdAt: new Date(),
         updatedAt: new Date(),
       },
-      {
-        email: 'restaurant@example.com',
-        passwordHash: await bcrypt.hash('password456', saltRounds),
-        role: 'restaurantOwner',
-        phoneNumber: '0987654321',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        email: 'driver@example.com',
-        passwordHash: await bcrypt.hash('password789', saltRounds),
-        role: 'driver',
-        phoneNumber: '1122334455',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }
     ];
 
     await User.bulkCreate(users);

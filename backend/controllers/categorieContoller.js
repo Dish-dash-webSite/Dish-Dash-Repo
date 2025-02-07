@@ -1,4 +1,5 @@
-const { Category } = require('../database/associations');
+const { Category,Restaurant } = require('../database/associations');
+
 
 // Create a new category
 const createCategory = async (req, res) => {
@@ -14,8 +15,8 @@ const createCategory = async (req, res) => {
 // Get all categories
 const getAllCategories = async (req, res) => {
     try {
-        const categories = await Category.findAll();
-        res.status(200).json(categories);
+        const restaurant = await Restaurant.findAll();
+        res.status(200).json(restaurant);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -72,15 +73,7 @@ const deleteCategory = async (req, res) => {
 };
 
 // Search categories by name and cuisineType
-const searchCategoriesByName = async (req, res) => {
-    try {
-        const { name, cuisineType } = req.query;
-        const categories = await Category.searchByNameAndCuisineType(name, cuisineType);
-        res.status(200).json(categories);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
+
 
 module.exports = {
     createCategory,
@@ -88,5 +81,5 @@ module.exports = {
     getCategoryById,
     updateCategory,
     deleteCategory,
-    searchCategoriesByName,
+ 
 };

@@ -13,20 +13,31 @@ const categoryRoutes = require("./routes/categorieRoutes.js");
 
 const app = express();
 // const allowedOrigins = ['http://localhost:5174', 'https://your-production-domain.com'];
+// const allowedOrigins = ['http://localhost:5173', 'http://localhost:5181'];
 
-const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174'];
 
+// app.use(cors({
+//   origin: function ("origin", callback) {
+//     if (allowedOrigins.includes(origin) || !origin) { // for requests without origin (e.g. Postman)
+//       callback(null, true);
+//     } else {
+//       callback(new Error('Not allowed by CORS'));
+//     }
+//   },
+//   credentials: true,  // If you're using cookies
+// }))
 app.use(cors({
-  origin: (origin, callback) => {
-    // If origin is not provided (during a preflight request), it can be null
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);  // Allow the request
+  origin: function (origin, callback) {
+    if (!origin || /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin)) {
+      callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));  // Reject the request
+      callback(new Error("Not allowed by CORS"));
     }
   },
-  credentials: true  // Allow credentials (cookies, headers)
+  credentials: true, // Allow cookies/auth
 }));
+
+
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true })); 
 app.use(cookieParser());

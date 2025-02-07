@@ -8,6 +8,7 @@ const Users: React.FC = () => {
     const { users, status, error } = useAppSelector((state) => state.users);
     const navigate = useNavigate();
 
+    console.log('users',users)
     useEffect(() => {
         if (status === 'idle') {
             dispatch(fetchUsers());

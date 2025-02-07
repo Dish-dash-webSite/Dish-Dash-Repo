@@ -51,9 +51,20 @@ export interface ErrorResponse {
 export interface Restaurant {
   id: string;
   name: string;
-  image: string;
+  address: string;
+  cuisineType: string;
+  contactNumber: string;
+  openingH: string;
+  closingH: string;
+  rating: number;
+  imageUrl?: string;
   discount?: number;
-  type: string;
+  type?: string;
+  restaurantOwnerId?: number;
+  geolocation?: {
+    latitude: number;
+    longitude: number;
+  };
 }
 
 export interface MenuItem {
@@ -87,18 +98,6 @@ export interface Category {
   name: string;
   image: string;
   restaurantCount: number;
-}
-export interface Restaurant {
-  id: string;
-  name: string;
-  address: string;
-  cuisineType: string;
-  contactNumber: string;
-  openingH: string;
-
-  closingH: string;
-  rating: number;
-  imageUrl?: string; // Optional if you have images
 }
 
 interface DriverLocation {

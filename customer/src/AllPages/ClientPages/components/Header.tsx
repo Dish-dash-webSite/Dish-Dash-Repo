@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { UtensilsCrossed, Search, MapPin } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { searchRestaurants } from '../../../store/restaurantsSlice';
+import { searchRestaurants } from '../../../store/restaurantThunks';
 import { useNavigate } from 'react-router-dom';
 import { AppDispatch } from '../../../store';
 

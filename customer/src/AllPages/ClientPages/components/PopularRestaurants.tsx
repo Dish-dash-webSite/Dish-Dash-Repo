@@ -1,33 +1,51 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '../../../store';
-import type { Restaurant } from '../../../types';
-
-
+import { fetchPopularRestaurants } from '../../../store/restaurantThunks';
+import { AppDispatch } from '../../../store';
 
 const PopularRestaurants: React.FC = () => {
-  const restaurants: Restaurant[] = useSelector((state: RootState) => state.restaurants.popularRestaurants);
+  const dispatch = useDispatch<AppDispatch>();
+  const restaurants = useSelector((state: RootState) => state.restaurants.popularRestaurants);
+  const loading = useSelector((state: RootState) => state.restaurants.loading);
+
+  useEffect(() => {
+    console.log('1. Fetching restaurants...');
+    dispatch(fetchPopularRestaurants())
+      .then((result) => {
+        console.log('2. Fetch result:', result);
+      })
+      .catch((error) => {
+        console.error('3. Fetch error:', error);
+      });
+  }, [dispatch]);
+
+  // Log whenever restaurants or loading changes
+  useEffect(() => {
+    console.log('4. Current restaurants:', restaurants);
+    console.log('5. Loading state:', loading);
+  }, [restaurants, loading]);
+
+  if (loading) {
+    console.log('6. Showing loading state');
+    return <div>Loading...</div>;
+  }
+
+  console.log('7. Rendering restaurants:', restaurants);
 
   return (
     <section className="py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-2xl font-bold mb-6">Popular Restaurants</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {restaurants.map((restaurant) => (
             <div key={restaurant.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-              {restaurant.imageUrl && (
-                <img 
-                  src={restaurant.imageUrl} 
-                  alt={restaurant.name} 
-                  className="w-full h-48 object-cover"
-                />
-              )}
               <div className="p-4">
                 <div className="flex justify-between items-start">
                   <h3 className="text-xl font-semibold">{restaurant.name}</h3>
                   <div className="flex items-center">
                     <span className="text-yellow-400">★</span>
-                    <span className="ml-1">{restaurant.rating?.toFixed(1) || 'N/A'}</span>
+                    <span className="ml-1">{restaurant.rating?.toFixed(1)}</span>
                   </div>
                 </div>
                 <p className="text-gray-600 mt-2">{restaurant.cuisineType}</p>

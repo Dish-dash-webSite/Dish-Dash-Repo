@@ -3,16 +3,31 @@ import MetricCard from "./MetricCard";
 import { FaBox, FaDollarSign, FaClipboardList, FaCheckCircle } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import image1 from '../../../assets/deleveray image.jpg';
+import { useSelector, useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { fetchDashboardData } from "../../../store/dashboardSlice"
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchDashboardData());
+  }, [dispatch]);
+
+  
+  const balance = useSelector((state) => state.dashboard.balance);
+  const delivered = useSelector((state) => state.dashboard.delivered);
+  const available = useSelector((state) => state.dashboard.available);
+  
+
   return (
     <main className="flex flex-col items-center justify-center gap-8 pt-40 p-4">
       {/* Existing MetricCard components */}
       <div className="flex flex-row flex-wrap justify-center gap-4">
-        <MetricCard title="Orders Delivered" value={120} icon={<FaBox className="text-[#FC8A06] text-3xl mb-4" />} />
-        <MetricCard title="Money Made" value="$5,000" icon={<FaDollarSign className="text-[#FC8A06] text-3xl mb-4" />} />
-        <MetricCard title="Orders available" value={45} icon={<FaClipboardList className="text-[#FC8A06] text-3xl mb-4" />} />
+        <MetricCard title="Orders Delivered" value={delivered} icon={<FaBox className="text-[#FC8A06] text-3xl mb-4" />} />
+        <MetricCard title="Money Made" value={`$${balance}`} icon={<FaDollarSign className="text-[#FC8A06] text-3xl mb-4" />} />
+        <MetricCard title="Orders available" value={available} icon={<FaClipboardList className="text-[#FC8A06] text-3xl mb-4" />} />
         <MetricCard title="Tasks Completed" value={89} icon={<FaCheckCircle className="text-[#FC8A06] text-3xl mb-4" />} />
       </div>
 

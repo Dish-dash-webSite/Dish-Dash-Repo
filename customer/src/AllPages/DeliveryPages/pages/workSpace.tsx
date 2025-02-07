@@ -1,5 +1,5 @@
 import React from 'react';
-
+import WorkSpaceMap from "../component/map"
 const WorkSpace: React.FC = () => {
   const handleGetLocation = () => {
     if (navigator.geolocation) {
@@ -21,6 +21,7 @@ const WorkSpace: React.FC = () => {
   return (
     <div>
       <div>workSpace</div>
+      <WorkSpaceMap/>
       <button onClick={handleGetLocation}>Get My Location</button>
     </div>
   );

@@ -1,16 +1,116 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, User, UtensilsCrossed } from 'lucide-react';
+import axios from 'axios';
+import { registerUser, loginUser } from '../../../store/authThunks';
+import { useDispatch } from 'react-redux';
 
 const Signup: React.FC = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    firstName: '',
+    lastName: '',
+    deliveryAddress: '',
+    role: 'customer'
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+    
+    // Email validation
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Invalid email format';
+    }
+
+    // Password validation
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters long';
+    }
+
+    // Name validation
+    if (!formData.firstName) newErrors.firstName = 'First name is required';
+    if (!formData.lastName) newErrors.lastName = 'Last name is required';
+    
+    // Address validation
+    if (!formData.deliveryAddress) newErrors.deliveryAddress = 'Delivery address is required';
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+  };
+
+  const clearForm = () => {
+    setFormData({
+      email: '',
+      password: '',
+      firstName: '',
+      lastName: '',
+      deliveryAddress: '',
+      role: 'customer'
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle signup logic here
-    console.log('Signup:', { name, email, password });
+    setApiError(null);
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Use registerUser thunk instead of direct axios call
+      await dispatch(registerUser({
+        email: formData.email,
+        password: formData.password,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        deliveryAddress: formData.deliveryAddress,
+        role: 'customer'
+      }));
+
+      // After successful registration, login the user
+      await dispatch(loginUser({
+        email: formData.email,
+        password: formData.password
+      }));
+
+      // Clear form and redirect
+      clearForm();
+      navigate('/');
+      
+    } catch (err: any) {
+      console.error('Signup error:', err);
+      setApiError(err.message || 'Failed to create account');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -47,27 +147,53 @@ const Signup: React.FC = () => {
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <div className="rounded-md shadow-sm space-y-4">
               <div>
-                <label htmlFor="name" className="sr-only">
-                  Full name
+                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+                  First Name
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <User className="h-5 w-5 text-gray-400" />
                   </div>
                   <input
-                    id="name"
-                    name="name"
+                    id="firstName"
+                    name="firstName"
                     type="text"
                     required
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="appearance-none relative block w-full px-12 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
-                    placeholder="Full name"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    className={`appearance-none relative block w-full px-12 py-3 border ${
+                      errors.firstName ? 'border-red-500' : 'border-gray-300'
+                    } placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm`}
+                    placeholder="First name"
                   />
                 </div>
+                {errors.firstName && <p className="mt-1 text-sm text-red-500">{errors.firstName}</p>}
               </div>
               <div>
-                <label htmlFor="email" className="sr-only">
+                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
+                  Last Name
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <User className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    id="lastName"
+                    name="lastName"
+                    type="text"
+                    required
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    className={`appearance-none relative block w-full px-12 py-3 border ${
+                      errors.lastName ? 'border-red-500' : 'border-gray-300'
+                    } placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm`}
+                    placeholder="Last name"
+                  />
+                </div>
+                {errors.lastName && <p className="mt-1 text-sm text-red-500">{errors.lastName}</p>}
+              </div>
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                   Email address
                 </label>
                 <div className="relative">
@@ -80,12 +206,35 @@ const Signup: React.FC = () => {
                     type="email"
                     autoComplete="email"
                     required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="appearance-none relative block w-full px-12 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className={`appearance-none relative block w-full px-12 py-3 border ${
+                      errors.email ? 'border-red-500' : 'border-gray-300'
+                    } placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm`}
                     placeholder="Email address"
                   />
                 </div>
+                {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email}</p>}
+              </div>
+              <div>
+                <label htmlFor="deliveryAddress" className="block text-sm font-medium text-gray-700">
+                  Delivery Address
+                </label>
+                <div className="relative">
+                  <input
+                    id="deliveryAddress"
+                    name="deliveryAddress"
+                    type="text"
+                    required
+                    value={formData.deliveryAddress}
+                    onChange={handleChange}
+                    className={`appearance-none relative block w-full px-12 py-3 border ${
+                      errors.deliveryAddress ? 'border-red-500' : 'border-gray-300'
+                    } placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm`}
+                    placeholder="Delivery Address"
+                  />
+                </div>
+                {errors.deliveryAddress && <p className="mt-1 text-sm text-red-500">{errors.deliveryAddress}</p>}
               </div>
               <div>
                 <label htmlFor="password" className="sr-only">
@@ -101,8 +250,11 @@ const Signup: React.FC = () => {
                     type="password"
                     autoComplete="new-password"
                     required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={formData.password}
+                    onChange={(e) => setFormData(prev => ({
+                      ...prev,
+                      password: e.target.value
+                    }))}
                     className="appearance-none relative block w-full px-12 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
                     placeholder="Password"
                   />
@@ -130,12 +282,19 @@ const Signup: React.FC = () => {
               </label>
             </div>
 
+            {apiError && (
+              <div className="text-red-500 text-sm text-center">
+                {apiError}
+              </div>
+            )}
+
             <div>
               <button
                 type="submit"
-                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors duration-200"
+                disabled={isLoading}
+                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors duration-200 disabled:bg-orange-300"
               >
-                Create account
+                {isLoading ? 'Creating account...' : 'Create account'}
               </button>
             </div>
           </form>

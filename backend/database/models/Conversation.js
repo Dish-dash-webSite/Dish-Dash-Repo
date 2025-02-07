@@ -21,6 +21,16 @@ module.exports = (sequelize, DataTypes) => {
                 key: 'id',
             },
         },
+        orderId: {
+            type: DataTypes.INTEGER,
+            allowNull: true
+        },
+        status: {
+            type: DataTypes.ENUM('active', 'closed'),
+            defaultValue: 'active'
+        }
+    }, {
+        tableName: 'Conversations'
     });
     
     return Conversation;

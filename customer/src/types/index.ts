@@ -88,18 +88,22 @@ export interface Category {
   image: string;
   restaurantCount: number;
 }
-export const ADD_RESTAURANT = 'ADD_RESTAURANT';
+export interface Restaurant {
+  id: string;
+  name: string;
+  address: string;
+  cuisineType: string;
+  contactNumber: string;
+  openingH: string;
 
-export type ActionTypes =
-  | { type: typeof ADD_RESTAURANT; payload: Restaurant }
+  closingH: string;
+  rating: number;
+  imageUrl?: string; // Optional if you have images
+}
 
-// export interface Restaurant {
-//   idy: number;
-//   name: string;
-//   cuisine: string;
-//   address: string;
-//   rating: number;
-//   contactNumber: string;
-//   openingTime: string;
-//   closingTime: string;
-// }
+interface DriverLocation {
+  lat: number;
+  lng: number;
+  driverId: string;
+  orderId: string;
+}

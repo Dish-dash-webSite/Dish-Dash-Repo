@@ -1,28 +1,41 @@
-import React from 'react';
-import WorkSpaceMap from "../component/map"
+import React, { useState } from 'react';
+import WorkSpaceMap from "../component/map";
+import Navbar from "../component/NavBar";
+import Sidebar from "../component/Sidebar";
+
 const WorkSpace: React.FC = () => {
-  const handleGetLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          alert(`Your current location is:\nLatitude: ${latitude}\nLongitude: ${longitude}`);
-        },
-        (error) => {
-          alert(`Error getting location: ${error.message}`);
-        }
-      );
-    } else {
-      alert('Geolocation is not supported by this browser.');
-    }
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
   };
 
+  const handleMenuItemClick = (menuItem: string) => {
+    console.log(`Selected menu item: ${menuItem}`);
+  };
+
+  const handleMapLoaded = () => {
+    setIsLoading(false);
+  };
 
   return (
-    <div>
-      <div>workSpace</div>
-      <WorkSpaceMap/>
-      <button onClick={handleGetLocation}>Get My Location</button>
+    <div style={{ 
+        backgroundColor: '#ffffff', 
+        minHeight: '100vh',
+        paddingTop: isLoading ? '0' : '80px'
+    }}>
+      {!isLoading && (
+        <>
+          <Navbar toggleSidebar={toggleSidebar} />
+          <Sidebar 
+            isSidebarOpen={isSidebarOpen} 
+            closeSidebar={() => setIsSidebarOpen(false)}
+            onMenuItemClick={handleMenuItemClick}
+          />
+        </>
+      )}
+      <WorkSpaceMap onMapLoaded={handleMapLoaded} />
     </div>
   );
 };

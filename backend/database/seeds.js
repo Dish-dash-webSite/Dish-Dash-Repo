@@ -16,10 +16,11 @@ const restaurantOwner = require('./models/restaurantOwner');
 const seedUser = async () => {
   try {
     const users = [
+   
       {
-        email: 'FahmiNjjari@example.com',
+        email: 'zeineb@example.com',
         passwordHash: await bcrypt.hash('Test123$', saltRounds),
-        role: 'customer',
+        role: 'restaurantOwner',
         phoneNumber: '1234567890',
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -243,11 +244,12 @@ const seedsRestaurantOwner = async () => {
   }
 }
 
+
 // seedUser()
 // seedCustomer()
 // seedsRestaurantOwner()
-seedsRestaurant()
+// seedsRestaurant()
 // seedDriver()
-// seedCategory()
+seedCategory()
 // seedGeolocation()
 // seedMenuItem()

@@ -11,10 +11,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       unique: true,
     },
-    cuisineType: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
+    // cuisineType: {
+    //   type: DataTypes.STRING,
+    //   allowNull: false,
+    // },
   });
   
   // Search by category name and cuisineType

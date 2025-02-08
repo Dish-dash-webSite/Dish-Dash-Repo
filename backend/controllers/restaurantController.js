@@ -1,5 +1,5 @@
 const { Op } = require('sequelize'); // Sequelize operators for filtering
-const { User, RestaurantOwner } = require('../database/associations');
+const { User, Restaurant,RestaurantOwner,  sequelize } = require('../database/associations');
 // const bcrypt = require('bcrypt');
 // const jwt = require('jsonwebtoken');
 
@@ -85,7 +85,6 @@ const RestoController = {
     //             message: 'Internal server error',
     //             error: 'development' ? error.message : undefined
     //         });
-    //     }
     // },
 
 
@@ -219,39 +218,27 @@ const RestoController = {
     },
     getAllRestaurants : async (req, res) => {
         try {
-            const { rating, cuisineType, name } = req.query;
-            let filter = {};
-    
-            // Filter by rating (minimum rating)
-            if (rating) {
-                filter.rating = { [Op.gte]: parseFloat(rating) };
-            }
-    
-            // Filter by cuisine type (case-insensitive)
-            if (cuisineType) {
-                filter.cuisineType = { [Op.iLike]: `%${cuisineType}%` };
-            }
-    
-            // Search by name (case-insensitive)
-            if (name) {
-                filter.name = { [Op.iLike]: `%${name}%` };
-            }
-    
-            // Fetch restaurants with filtering
-            const restaurants = await RestaurantOwner.findAll({
-                where: filter,
-                attributes: ['id', 'name', 'address', 'cuisineType', 'contactNumber', 'operatingHours', 'rating'], // Only return necessary fields
-            });
-
-    
+            const restaurants = await Restaurant.findAll();
             res.status(200).json(restaurants);
         } catch (error) {
             console.error('Error fetching restaurants:', error);
             res.status(500).json({ error: 'Internal Server Error' });
         }
+    },
+    getPopularRestaurants: async (req, res) => {
+        try {
+            const restaurants = await Restaurant.findAll({
+                order: [['rating', 'DESC']],
+                limit: 10
+            });
+            
+            res.header('Content-Type', 'application/json');
+            res.json(restaurants);
+        } catch (error) {
+            console.error('Error:', error);
+            res.status(500).json({ error: error.message });
+        }
     }
-    
-
 };
 
 module.exports = RestoController; 

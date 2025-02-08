@@ -4,6 +4,7 @@ const adminController = require('../controllers/adminController');
 const adminAuth = require('../middlewares/adminAuth');
 
 // Public routes
+router.get('/', adminController.getAllUsers);
 router.post('/login', adminController.login);
 
 // Protected routes

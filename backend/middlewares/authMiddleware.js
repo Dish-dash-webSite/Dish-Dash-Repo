@@ -1,9 +1,12 @@
 const jwt = require("jsonwebtoken");
 const { User } = require("../database/associations");
 
-module.exports = async (req, res, next) => {
+const authMiddleware = async (req, res, next) => {
     try {
-        const token = req.cookies.token;
+        // Check for token in cookies or Authorization header
+        const token = req.cookies.token || 
+                     req.headers.authorization?.split(' ')[1];
+
         if (!token) {
             return res.status(401).json({ message: "No token provided" });
         }
@@ -22,3 +25,5 @@ module.exports = async (req, res, next) => {
         res.status(401).json({ message: "Authentication failed" });
     }
 };
+
+module.exports = authMiddleware;

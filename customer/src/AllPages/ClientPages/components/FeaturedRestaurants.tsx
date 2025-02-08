@@ -25,6 +25,7 @@ const FeaturedRestaurants: React.FC = () => {
           {restaurants.slice(0, 3).map((restaurant) => (
             <div key={restaurant.id} className="bg-white rounded-lg shadow-md overflow-hidden">
               <div className="p-4">
+                <img src={restaurant.image} />
                 <h3 className="text-xl font-semibold">{restaurant.name}</h3>
                 <p className="text-gray-600">{restaurant.cuisineType}</p>
                 <p className="text-gray-500 text-sm">{restaurant.address}</p>

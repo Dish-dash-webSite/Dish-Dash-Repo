@@ -1,3 +1,5 @@
+import React from 'react';
+
 export type UserRole = 'customer' | 'restaurantOwner' | 'meta' | 'driver' | 'admin';
 
 // Represents a fully registered user
@@ -13,6 +15,7 @@ export interface User {
 
 export interface VerifyDriverResponse {
   data: string;
+  isDriver: boolean
 }
 // Used for signing up a new user
 export interface UserSignup {
@@ -74,10 +77,11 @@ export interface Restaurant {
   openingH: string;
   closingH: string;
   rating: number;
-  imageUrl?: string;
+  image?: string;
   discount?: number;
   type?: string;
   restaurantOwnerId?: number;
+  location?: string;
   geolocation?: {
     latitude: number;
     longitude: number;

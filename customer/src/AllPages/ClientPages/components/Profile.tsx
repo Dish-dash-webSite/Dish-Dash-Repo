@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../store';
 import { fetchProfile, updateProfile } from '../../../store/profileThunks';
@@ -13,6 +12,11 @@ const Profile: React.FC = () => {
 
   const [formState, setFormState] = useState(profile || {});
   const [isEditing, setIsEditing] = useState(false);
+  
+  // New state for password update
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   useEffect(() => {
     dispatch(fetchProfile());
@@ -32,16 +36,64 @@ const Profile: React.FC = () => {
     }) : null);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    if (name === 'oldPassword') setOldPassword(value);
+    if (name === 'newPassword') setNewPassword(value);
+    if (name === 'confirmPassword') setConfirmPassword(value);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    dispatch(updateProfile(formState))
+
+    console.log('Old Password:', oldPassword);
+
+    try {
+      // Verify old password
+      const response = await fetch('http://localhost:3000/api/users/verify-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Remove the 'credentials' header as it's not a valid header
+          'Authorization': `Bearer ${document.cookie.split('token=')[1]?.split(';')[0] || ''}`
+        },
+        credentials: 'include', // This is enough for including cookies
+        body: JSON.stringify({ oldPassword }) // Remove userId from body as we'll get it from token
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        alert(errorData.message);
+        return;
+      }
+
+      // If old password is verified, proceed to update the profile
+      if (newPassword !== confirmPassword) {
+        alert('New passwords do not match.');
+        return;
+      }
+
+      dispatch(updateProfile({ 
+        ...formState, 
+        password: newPassword // Send the new password
+      }))
       .unwrap()
       .then(() => {
         setIsEditing(false);
+        setOldPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+        alert('Profile updated successfully!');
       })
       .catch(err => {
         console.error('Failed to update profile:', err);
+        alert('Failed to update profile. Please try again.');
       });
+
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to verify password. Please try again.');
+    }
   };
 
   if (loading) return (
@@ -179,6 +231,44 @@ const Profile: React.FC = () => {
                     />
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* Password Update Section */}
+            <div className="space-y-6 mt-8">
+              <h3 className="text-lg font-medium text-gray-900">Change Password</h3>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Old Password</label>
+                <input
+                  type="password"
+                  name="oldPassword"
+                  value={oldPassword}
+                  onChange={handlePasswordChange}
+                  className="block w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-orange-500 focus:border-orange-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">New Password</label>
+                <input
+                  type="password"
+                  name="newPassword"
+                  value={newPassword}
+                  onChange={handlePasswordChange}
+                  className="block w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-orange-500 focus:border-orange-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Confirm New Password</label>
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  value={confirmPassword}
+                  onChange={handlePasswordChange}
+                  className="block w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-orange-500 focus:border-orange-500"
+                  required
+                />
               </div>
             </div>
 

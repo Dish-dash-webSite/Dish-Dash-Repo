@@ -235,17 +235,31 @@ exports.updateProfile = async (req, res) => {
         phoneNumber, 
         firstName, 
         lastName, 
-        deliveryAddress 
+        deliveryAddress,
+        password
     } = req.body;
 
     try {
-        await User.update(
-            { 
-                email: email || undefined,
-                phoneNumber: phoneNumber || undefined
-            },
-            { where: { id } }
-        );
+        // If password is provided, hash it
+        if (password) {
+            const passwordHash = await bcrypt.hash(password, 10);
+            await User.update(
+                { 
+                    email: email || undefined,
+                    phoneNumber: phoneNumber || undefined,
+                    passwordHash
+                },
+                { where: { id } }
+            );
+        } else {
+            await User.update(
+                { 
+                    email: email || undefined,
+                    phoneNumber: phoneNumber || undefined
+                },
+                { where: { id } }
+            );
+        }
 
         // Update based on user role
         switch(req.user.role) {
@@ -299,3 +313,28 @@ exports.deleteProfile = async (req, res) => {
         res.status(500).json({ error: "Failed to delete profile" });
     }
 };
+
+// Function to verify old password
+exports.verifyPassword = async (req, res) => {
+  console.log('Password verification request received');
+  const { oldPassword } = req.body;
+  
+  try {
+    // Use the authenticated user from the middleware
+    const user = req.user;
+    console.log('User from token:', user.id);
+
+    const isMatch = await bcrypt.compare(oldPassword, user.passwordHash);
+    console.log('Password match:', isMatch);
+
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Old password does not match' });
+    }
+
+    return res.status(200).json({ message: 'Password verified' });
+  } catch (error) {
+    console.error('Error verifying password:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+

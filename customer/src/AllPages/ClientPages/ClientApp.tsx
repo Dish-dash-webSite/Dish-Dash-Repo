@@ -4,13 +4,11 @@ import SignUp from "./pages/Signup"
 import Login from "./pages/Login"
 import MenuList from "./components/RestaurantMenu";
 import Navbar from "../../components/Navbar";
-import Header from "./components/Header";
 import Footer from "../../components/Footer"
 const ClientApp: React.FC = () => {
   return (
     <div>
       <Navbar />
-      <Header />
       <Routes>
         <Route path="*" element={<Homepage />} />
         <Route path="/signup" element={<SignUp />} />

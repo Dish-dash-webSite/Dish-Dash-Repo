@@ -1,22 +1,23 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { UtensilsCrossed, Search, MapPin } from 'lucide-react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { searchRestaurants } from '../../../store/restaurantThunks';
 import { useNavigate } from 'react-router-dom';
 import { AppDispatch } from '../../../store';
 
+interface HeaderProps {
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+  handleSearch: (query: string) => void;
+}
 
-const Header: React.FC = () => {
+const Header: React.FC<HeaderProps> = ({ searchQuery, setSearchQuery, handleSearch }) => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      dispatch(searchRestaurants(searchQuery));
-      navigate('/search-results');
-    }
+    handleSearch(searchQuery);
   };
 
   const handleNearMe = () => {
@@ -34,6 +35,10 @@ const Header: React.FC = () => {
     }
   };
 
+  const handleCategoryClick = (category: string) => {
+    handleSearch(category);
+  };
+
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -45,7 +50,7 @@ const Header: React.FC = () => {
           </div>
 
           {/* Search Bar */}
-          <form onSubmit={handleSearch} className="flex-1 max-w-2xl hidden md:flex gap-2">
+          <form onSubmit={handleSearchSubmit} className="flex-1 max-w-2xl hidden md:flex gap-2">
             <div className="relative flex-1">
               <input
                 type="text"
@@ -74,10 +79,10 @@ const Header: React.FC = () => {
 
           {/* Navigation */}
           <nav className="flex space-x-8">
-            <a href="#" className="text-gray-900 hover:text-orange-500">Vegan</a>
-            <a href="#" className="text-gray-900 hover:text-orange-500">Sushi</a>
-            <a href="#" className="text-orange-500 font-medium">Pizza & Fast food</a>
-            <a href="#" className="text-gray-900 hover:text-orange-500">Others</a>
+            <button onClick={() => handleCategoryClick('Vegan')} className="text-gray-900 hover:text-orange-500">Vegan</button>
+            <button onClick={() => handleCategoryClick('Sushi')} className="text-gray-900 hover:text-orange-500">Sushi</button>
+            <button onClick={() => handleCategoryClick('Pizza & Fast food')} className="text-orange-500 font-medium">Pizza & Fast food</button>
+            <button onClick={() => handleCategoryClick('Others')} className="text-gray-900 hover:text-orange-500">Others</button>
           </nav>
         </div>
       </div>

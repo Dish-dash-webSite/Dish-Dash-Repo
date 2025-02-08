@@ -3,9 +3,11 @@ import { useAppDispatch, useAppSelector } from '../../../store';
 import { fetchProfile, updateProfile } from '../../../store/profileThunks';
 import { Camera, Mail, Phone, MapPin, Globe, Save } from 'lucide-react';
 import { RootState } from '../../../store';
+import { useNavigate } from 'react-router-dom';
 
 const Profile: React.FC = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const profile = useAppSelector((state: RootState) => state.profile.profile);
   const loading = useAppSelector((state: RootState) => state.profile.loading);
   const error = useAppSelector((state: RootState) => state.profile.error);
@@ -17,6 +19,8 @@ const Profile: React.FC = () => {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const uploadPreset = 'wuvf4swz';
+  const cloudName = 'dmpgbk6cz';
 
   useEffect(() => {
     dispatch(fetchProfile());
@@ -43,39 +47,68 @@ const Profile: React.FC = () => {
     if (name === 'confirmPassword') setConfirmPassword(value);
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', uploadPreset); // Replace with your Cloudinary upload preset
+
+
+    try {
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+        method: 'POST',
+        body: formData,
+      });
+
+
+      const data = await response.json();
+      if (data.secure_url) {
+        setFormState(prev => prev ? { ...prev, avatar: data.secure_url } : null);
+        alert('Image uploaded successfully!');
+      } else {
+        alert('Failed to upload image.');
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('Error uploading image. Please try again.');
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log('Old Password:', oldPassword);
-
     try {
-      // Verify old password
-      const response = await fetch('http://localhost:3000/api/users/verify-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          // Remove the 'credentials' header as it's not a valid header
-          'Authorization': `Bearer ${document.cookie.split('token=')[1]?.split(';')[0] || ''}`
-        },
-        credentials: 'include', // This is enough for including cookies
-        body: JSON.stringify({ oldPassword }) // Remove userId from body as we'll get it from token
-      });
+      // Only verify password if user is trying to change it
+      if (oldPassword || newPassword || confirmPassword) {
+        // Verify old password
+        const response = await fetch('http://localhost:3000/api/users/verify-password', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${document.cookie.split('token=')[1]?.split(';')[0] || ''}`
+          },
+          credentials: 'include',
+          body: JSON.stringify({ oldPassword })
+        });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        alert(errorData.message);
-        return;
+        if (!response.ok) {
+          const errorData = await response.json();
+          alert(errorData.message);
+          return;
+        }
+
+        if (newPassword !== confirmPassword) {
+          alert('New passwords do not match.');
+          return;
+        }
       }
 
-      // If old password is verified, proceed to update the profile
-      if (newPassword !== confirmPassword) {
-        alert('New passwords do not match.');
-        return;
-      }
-
+      // Update profile with or without password
       dispatch(updateProfile({ 
         ...formState, 
-        password: newPassword // Send the new password
+        password: newPassword || undefined // Only include password if it's being changed
       }))
       .unwrap()
       .then(() => {
@@ -84,6 +117,8 @@ const Profile: React.FC = () => {
         setNewPassword('');
         setConfirmPassword('');
         alert('Profile updated successfully!');
+        navigate('/');
+        window.scrollTo(0, 0); // Scroll to the top of the page
       })
       .catch(err => {
         console.error('Failed to update profile:', err);
@@ -92,7 +127,7 @@ const Profile: React.FC = () => {
 
     } catch (error) {
       console.error('Error:', error);
-      alert('Failed to verify password. Please try again.');
+      alert('Failed to update profile. Please try again.');
     }
   };
 
@@ -131,16 +166,11 @@ const Profile: React.FC = () => {
             <div className="flex items-center space-x-6 mb-8">
               <div className="relative">
                 <img
-                  src={profile.avatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"}
+                  src={formState.avatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"}
                   alt={profile.firstName}
                   className="h-24 w-24 rounded-full object-cover border-4 border-orange-100"
                 />
-                <button
-                  type="button"
-                  className="absolute bottom-0 right-0 bg-orange-500 p-2 rounded-full text-white hover:bg-orange-600 transition-colors duration-200"
-                >
-                  <Camera className="h-4 w-4" />
-                </button>
+                
               </div>
               <div>
                 <h3 className="text-lg font-medium text-gray-900">
@@ -231,6 +261,21 @@ const Profile: React.FC = () => {
                     />
                   </div>
                 </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700">Update Profile Picture</label>
+                  <div className="mt-1 relative rounded-md shadow-sm">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <MapPin className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                     type="file"
+                     accept="image/*"
+                     onChange={handleImageUpload}
+                      disabled={!isEditing}
+                      className="block w-full pl-10 px-4 py-3 rounded-lg border border-gray-300 focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-50 disabled:text-gray-500"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -245,7 +290,6 @@ const Profile: React.FC = () => {
                   value={oldPassword}
                   onChange={handlePasswordChange}
                   className="block w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-orange-500 focus:border-orange-500"
-                  required
                 />
               </div>
               <div>
@@ -256,7 +300,6 @@ const Profile: React.FC = () => {
                   value={newPassword}
                   onChange={handlePasswordChange}
                   className="block w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-orange-500 focus:border-orange-500"
-                  required
                 />
               </div>
               <div>
@@ -267,7 +310,6 @@ const Profile: React.FC = () => {
                   value={confirmPassword}
                   onChange={handlePasswordChange}
                   className="block w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-orange-500 focus:border-orange-500"
-                  required
                 />
               </div>
             </div>

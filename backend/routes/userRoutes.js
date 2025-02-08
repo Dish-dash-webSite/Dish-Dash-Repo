@@ -10,7 +10,7 @@ router.post("/logout", userController.logout); // Logout should clear cookies
 
 // Protected Routes (Require Auth)
 router.get("/profile", authMiddleware, userController.getProfile);
-router.put("/profile", authMiddleware, userController.updateUser);
-router.delete("/profile", authMiddleware, userController.deleteUser);
+router.put("/profile", authMiddleware, userController.updateProfile);
+router.delete("/profile", authMiddleware, userController.deleteProfile);
 
 module.exports = router;

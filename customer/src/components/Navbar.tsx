@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../store/index';
 import { logoutUser } from '../store/authThunks';
 import { MapPin, ShoppingBag, /*Search, */User, LogOut } from 'lucide-react';
+import ProfileDropdown from '../AllPages/ClientPages/components/ProfileDropdown';
 
 
 const Navbar = () => {
@@ -52,23 +53,18 @@ const Navbar = () => {
             </div>
             
             {user ? (
-              <div className="flex items-center space-x-4">
-                <span className="text-gray-600">Hello, {user?.name}</span>
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center space-x-1 text-gray-600 hover:text-orange-500"
-                >
-                  <LogOut className="h-5 w-5" />
-                  <span>Logout</span>
-                </button>
-              </div>
+              <ProfileDropdown 
+                user={user}
+                onLogout={handleLogout}
+              />
             ) : (
               <div className="flex items-center space-x-4">
                 <Link
                   to="/login"
-                  className="text-gray-600 hover:text-orange-500"
+                  className="text-gray-600 hover:text-orange-500 flex items-center space-x-2"
                 >
-                  Login
+                  <User size={18} />
+                  <span>Login</span>
                 </Link>
                 <Link
                   to="/signup"

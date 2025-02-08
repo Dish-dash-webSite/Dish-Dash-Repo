@@ -13,6 +13,7 @@ const userRoutes = require("./routes/userRoutes");
 const DriverRouter= require("./routes/driverRoutes.js");
 const messageRoutes = require('./routes/messageRoutes');
 const { Conversation, Message } = require('./database/associations');
+const setupTracking = require('./tracking');
 
 
 
@@ -21,7 +22,7 @@ const httpServer = createServer(app);
 // const allowedOrigins = ['http://localhost:5173', 'http://localhost:5181'];
 
 // Update CORS configuration
-const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5181'];
+const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5181','http://localhost:5175'];
 
 app.use(cors({
   origin: function (origin, callback) {
@@ -108,6 +109,9 @@ app.use('/api/resto', RestoRoter);
 app.use('/api/admin', adminRoutes);
 app.use('/api/driver', DriverRouter);
 app.use('/api/messages', messageRoutes);
+
+// Setup tracking for driver location updates
+setupTracking(io);
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {

@@ -16,9 +16,10 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "allowImportingTsExtensions": true,
+    "types": ["jest", "node"],
   },
   "include": [
-    "src/*/"
+    "src/**/*", "setupTests.ts"
   ],
   "exclude": [
     "node_modules"

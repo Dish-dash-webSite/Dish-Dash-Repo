@@ -28,6 +28,23 @@ export interface UserSignin {
   email: string;
   password: string;
 }
+// Used for getting the user profile
+export interface UserProfile {
+  id?: string;
+  name?: string;
+  email?: string;
+  role: UserRole;
+  phone?: string;
+  address?: string;
+  avatar?: string;
+  language?: string;
+  emailNotifications?: boolean;
+  pushNotifications?: boolean;
+  phoneNumber?: string;
+  firstName?: string;
+  lastName?: string;
+  deliveryAddress?: string;
+}
 
 // Auth state interface for Redux
 export interface AuthState {

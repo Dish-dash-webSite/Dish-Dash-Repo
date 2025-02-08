@@ -89,7 +89,6 @@ Message.belongsTo(Conversation, { foreignKey: 'conversationId' });
 // });
 
 
-
 module.exports = {
   User,
   Customer,

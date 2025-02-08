@@ -10,12 +10,12 @@ const port = 3000;
 const db = require("./database/connection.js");
 const adminRoutes = require("./routes/adminRoutes");
 const userRoutes = require("./routes/userRoutes");
-const DriverRouter= require("./routes/driverRoutes.js");
+const DriverRouter = require("./routes/driverRoutes.js");
 const messageRoutes = require('./routes/messageRoutes');
 const { Conversation, Message } = require('./database/associations');
 const categoryRoutes = require("./routes/categorieRoutes.js");
 
-
+const ownerRestoRoute = require("./routes/restaurantOwner.js")
 
 const app = express();
 const httpServer = createServer(app);
@@ -100,17 +100,21 @@ io.on('connection', (socket) => {
   });
 });
 
-app.use(express.json()); 
-app.use(express.urlencoded({ extended: true })); 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Use routes
 app.use('/api/users', userRoutes);
-app.use('/api/resto', RestoRoter);
+app.use("/api/resto", RestoRoter);
 app.use('/api/admin', adminRoutes);
 app.use('/api/driver', DriverRouter);
 app.use('/api/messages', messageRoutes);
 app.use('/api/category', categoryRoutes);
+// ✅ Middleware
+// ✅ CORS Configuration for Cookies
+app.use("/api/owner", ownerRestoRoute)
+// app.use('/api/driver', DriverRouter);
 // ✅ Middleware
 // ✅ CORS Configuration for Cookies
 

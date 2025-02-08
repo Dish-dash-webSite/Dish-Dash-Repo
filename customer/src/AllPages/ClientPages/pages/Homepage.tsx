@@ -45,8 +45,8 @@ const Homepage: React.FC = () => {
   }, []);
 
   const handleSearch = (searchValue: string) => {
-    const filtered = categories.filter(category => 
-      category.name.toLowerCase().includes(searchValue.toLowerCase()) || 
+    const filtered = categories.filter(category =>
+      category.name.toLowerCase().includes(searchValue.toLowerCase()) ||
       category.cuisineType.toLowerCase().includes(searchValue.toLowerCase())
     );
 
@@ -55,7 +55,6 @@ const Homepage: React.FC = () => {
 
   return (
     <div>
-      <Navbar />
       <div className="min-h-screen bg-gray-50">
         <Header searchQuery={searchQuery} setSearchQuery={setSearchQuery} handleSearch={handleSearch} />
         <main>
@@ -66,7 +65,6 @@ const Homepage: React.FC = () => {
       </div>
       <RestaurantMap />
       <TestPage />
-      <Footer />
     </div>
   );
 };

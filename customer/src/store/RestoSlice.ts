@@ -1,76 +1,38 @@
-// store/restaurantSlice.ts
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import axios from 'axios';
+// restaurantSlice.ts
+import { createSlice } from '@reduxjs/toolkit';
+import { fetchMenu } from './RestoThunk'; // Import thunk for fetching menu data
 
-// Define the initial state for the restaurant
 interface RestaurantState {
-    name: string;
-    cuisine: string;
-    address: string;
-    rating: number;
-    contactNumber: string;
-    openingTime: string;
-    closingTime: string;
+    menu: any | null; // The menu data will be fetched for a restaurant
     loading: boolean;
-    successMessage: string | null;
     error: string | null;
 }
 
 const initialState: RestaurantState = {
-    name: '',
-    cuisine: '',
-    address: '',
-    rating: 0,
-    contactNumber: '',
-    openingTime: '',
-    closingTime: '',
+    menu: [],
     loading: false,
-    successMessage: null,
     error: null,
 };
-
-// Async thunk to create restaurant
-export const createRestaurant = createAsyncThunk(
-    'restaurant/create',
-    async (restaurantData: RestaurantState, { rejectWithValue }) => {
-        try {
-            const response = await axios.post('http://localhost:3000/api/resto/create', restaurantData);
-            console.log("hello from new", response.data)
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(error);
-        }
-    }
-);
 
 const restaurantSlice = createSlice({
     name: 'restaurant',
     initialState,
-    reducers: {
-        // Optionally, you can add an action to clear the success/error messages
-        clearMessages: (state) => {
-            state.successMessage = null;
-            state.error = null;
-        },
-    },
+    reducers: {},
     extraReducers: (builder) => {
         builder
-            .addCase(createRestaurant.pending, (state) => {
+            .addCase(fetchMenu.pending, (state) => {
                 state.loading = true;
                 state.error = null;
-                state.successMessage = null;
             })
-            .addCase(createRestaurant.fulfilled, (state, action: PayloadAction<any>) => {
+            .addCase(fetchMenu.fulfilled, (state, action) => {
+                state.menu = action.payload;
                 state.loading = false;
-                state.successMessage = action.payload; // Set success message from backend response
             })
-            .addCase(createRestaurant.rejected, (state, action) => {
+            .addCase(fetchMenu.rejected, (state, action) => {
+                state.error = action.error.message || 'Failed to fetch menu data';
                 state.loading = false;
-                state.error = action.payload as string; // Set error message
             });
     },
 });
 
-// Export actions and reducer
-export const { clearMessages } = restaurantSlice.actions;
 export default restaurantSlice.reducer;

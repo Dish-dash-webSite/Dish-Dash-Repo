@@ -1,102 +1,136 @@
-import { useState, ChangeEvent, FormEvent } from 'react';
-import Flag from 'react-world-flags'; // Import the Flag component
-
-interface RestaurantFormData {
-    name: string;
-    cuisine: string;
-    address: string;
-    rating: number;
-    contactNumber: string;
-    openingTime: string;
-    closingTime: string;
-}
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Flag from 'react-world-flags'; // Assuming you have a flag component or use an external package
 
 const RestaurantForm: React.FC = () => {
-    const [formData, setFormData] = useState<RestaurantFormData>({
+    const [formData, setFormData] = useState({
         name: '',
         cuisine: '',
         address: '',
-        rating: 1,
         contactNumber: '',
         openingTime: '',
         closingTime: '',
+        firstName: '',  // First Name state
+        lastName: '',   // Last Name state
     });
 
-    const [formErrors, setFormErrors] = useState<Partial<RestaurantFormData>>({});
+    const [formErrors, setFormErrors] = useState({
+        name: '',
+        cuisine: '',
+        address: '',
+        contactNumber: '',
+        openingTime: '',
+        closingTime: '',
+        firstName: '',  // First Name error state
+        lastName: '',   // Last Name error state
+    });
 
-    // Handle input changes dynamically
-    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
+    const navigate = useNavigate();
+
+    // Handle form input changes
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
-
-        // Clear error if field is corrected
-        setFormErrors((prevErrors) => ({
-            ...prevErrors,
-            [name]: '',
-        }));
+        setFormData({
+            ...formData,
+            [name]: value
+        });
     };
 
-    const validateForm = (): boolean => {
-        let isValid = true;
-        const errors: Partial<RestaurantFormData> = {};
+    // Validate the form before submitting
+    const validateForm = () => {
+        let errors = { ...formErrors };
+        let valid = true;
 
+        // Validation logic
         if (!formData.name) {
             errors.name = 'Restaurant name is required';
-            isValid = false;
+            valid = false;
         }
 
         if (!formData.cuisine) {
             errors.cuisine = 'Cuisine is required';
-            isValid = false;
+            valid = false;
         }
 
         if (!formData.address) {
             errors.address = 'Address is required';
-            isValid = false;
+            valid = false;
         }
 
         if (!formData.contactNumber) {
             errors.contactNumber = 'Contact number is required';
-            isValid = false;
+            valid = false;
         }
 
-        if (!formData.openingTime || !formData.closingTime) {
-            errors.openingTime = 'Both opening and closing times are required';
-            isValid = false;
+        if (!formData.openingTime) {
+            errors.openingTime = 'Opening time is required';
+            valid = false;
         }
 
-        if (formData.openingTime >= formData.closingTime) {
-            errors.openingTime = 'Opening time must be earlier than closing time';
-            isValid = false;
+        if (!formData.closingTime) {
+            errors.closingTime = 'Closing time is required';
+            valid = false;
+        }
+
+        if (!formData.firstName) {
+            errors.firstName = 'First Name is required';
+            valid = false;
+        }
+
+        if (!formData.lastName) {
+            errors.lastName = 'Last Name is required';
+            valid = false;
         }
 
         setFormErrors(errors);
-        return isValid;
+        return valid;
     };
 
-    const handleSubmit = (e: FormEvent): void => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!validateForm()) return;
-
-        // Handle form submission (e.g., call an API)
-        console.log('Restaurant Information:', formData);
+        if (validateForm()) {
+            // Handle successful form submission (e.g., dispatch action, API call, etc.)
+            console.log('Form submitted:', formData);
+            // Redirect or perform actions after form submission
+        }
     };
 
     return (
         <div className="flex min-h-screen bg-cover bg-center" style={{ backgroundImage: 'url(https://images.pexels.com/photos/30500761/pexels-photo-30500761.jpeg)' }}>
             <div className="w-full flex justify-center items-center bg-black bg-opacity-50">
                 <div className="w-full max-w-lg p-6 bg-white bg-opacity-70 rounded-lg shadow-xl border border-gray-300 relative">
-                    {/* Go back link */}
-                    <a href="/back" className="absolute top-4 right-4 text-sm text-orange-600 hover:underline">
-                        Go Back
-                    </a>
-
                     <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Restaurant Information</h2>
                     <form onSubmit={handleSubmit}>
+                        <div className="mb-4 flex gap-4">
+                            <div className="w-1/2">
+                                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">First Name</label>
+                                <input
+                                    type="text"
+                                    id="firstName"
+                                    name="firstName"
+                                    value={formData.firstName}
+                                    onChange={handleChange}
+                                    className={`mt-1 block w-full px-3 py-2 border ${formErrors.firstName ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm`}
+                                    required
+                                />
+                                {formErrors.firstName && <p className="text-red-500 text-sm">{formErrors.firstName}</p>}
+                            </div>
+
+                            <div className="w-1/2">
+                                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">Last Name</label>
+                                <input
+                                    type="text"
+                                    id="lastName"
+                                    name="lastName"
+                                    value={formData.lastName}
+                                    onChange={handleChange}
+                                    className={`mt-1 block w-full px-3 py-2 border ${formErrors.lastName ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm`}
+                                    required
+                                />
+                                {formErrors.lastName && <p className="text-red-500 text-sm">{formErrors.lastName}</p>}
+                            </div>
+                        </div>
                         {/* Restaurant Name */}
                         <div className="mb-4">
                             <label htmlFor="name" className="block text-sm font-medium text-gray-700">Restaurant Name</label>
@@ -112,18 +146,26 @@ const RestaurantForm: React.FC = () => {
                             {formErrors.name && <p className="text-red-500 text-sm">{formErrors.name}</p>}
                         </div>
 
-                        {/* Cuisine */}
+                        {/* Cuisine Dropdown */}
                         <div className="mb-4">
                             <label htmlFor="cuisine" className="block text-sm font-medium text-gray-700">Cuisine</label>
-                            <input
-                                type="text"
+                            <select
                                 id="cuisine"
                                 name="cuisine"
                                 value={formData.cuisine}
                                 onChange={handleChange}
                                 className={`mt-1 block w-full px-3 py-2 border ${formErrors.cuisine ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm`}
                                 required
-                            />
+                            >
+                                <option value="">Select Cuisine</option>
+                                <option value="Italian">Italian</option>
+                                <option value="Chinese">Chinese</option>
+                                <option value="Japanese">Japanese</option>
+                                <option value="Mexican">Mexican</option>
+                                <option value="Indian">Indian</option>
+                                <option value="Mediterranean">Mediterranean</option>
+                                {/* Add more cuisines here as needed */}
+                            </select>
                             {formErrors.cuisine && <p className="text-red-500 text-sm">{formErrors.cuisine}</p>}
                         </div>
 
@@ -142,9 +184,9 @@ const RestaurantForm: React.FC = () => {
                             {formErrors.address && <p className="text-red-500 text-sm">{formErrors.address}</p>}
                         </div>
 
-                        {/* Contact Number with +216 Prefix and Flag on the left */}
+                        {/* Contact Number */}
                         <div className="mb-4 flex items-center space-x-2">
-                            <Flag code="TN" style={{ width: '30px', height: '20px' }} className="mr-2" /> {/* Flag to the left */}
+                            <Flag code="TN" style={{ width: '30px', height: '20px' }} className="mr-2" />
                             <span className="text-gray-700 text-lg">+216</span>
                             <input
                                 type="tel"
@@ -159,7 +201,7 @@ const RestaurantForm: React.FC = () => {
                             {formErrors.contactNumber && <p className="text-red-500 text-sm">{formErrors.contactNumber}</p>}
                         </div>
 
-                        {/* Operation Hours (Opening & Closing Times) */}
+                        {/* Operation Hours */}
                         <div className="mb-4 flex gap-4">
                             <div className="w-1/2">
                                 <label htmlFor="openingTime" className="block text-sm font-medium text-gray-700">Opening Time</label>
@@ -189,24 +231,6 @@ const RestaurantForm: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Rating with Stars */}
-                        <div className="mb-6">
-                            <label htmlFor="rating" className="block text-sm font-medium text-gray-700">Rating</label>
-                            <div className="flex space-x-1">
-                                {[1, 2, 3, 4, 5].map((star) => (
-                                    <button
-                                        key={star}
-                                        type="button"
-                                        onClick={() => setFormData((prevData) => ({ ...prevData, rating: star }))}
-                                        className={`text-2xl ${formData.rating >= star ? 'text-yellow-500' : 'text-gray-300'}`}
-                                    >
-                                        &#9733;
-                                    </button>
-                                ))}
-                            </div>
-                            {formErrors.rating && <p className="text-red-500 text-sm">{formErrors.rating}</p>}
-                        </div>
-
                         {/* Submit Button */}
                         <button
                             type="submit"
@@ -215,6 +239,13 @@ const RestaurantForm: React.FC = () => {
                             Create
                         </button>
                     </form>
+
+                    {/* Login Link */}
+                    <div className="mt-4 text-center">
+                        <a href="/restaurant/loginResto" className="text-sm text-orange-600 hover:underline">
+                            Already have a restaurant? Log in here.
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

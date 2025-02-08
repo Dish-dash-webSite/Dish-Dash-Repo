@@ -16,10 +16,11 @@ const restaurantOwner = require('./models/restaurantOwner');
 const seedUser = async () => {
   try {
     const users = [
+   
       {
-        email: 'FahmiNjjari@example.com',
+        email: 'zeineb@example.com',
         passwordHash: await bcrypt.hash('Test123$', saltRounds),
-        role: 'customer',
+        role: 'restaurantOwner',
         phoneNumber: '1234567890',
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -243,39 +244,12 @@ const seedsRestaurantOwner = async () => {
   }
 }
 
-const seedDatabase = async () => {
-  try {
-    // Order matters due to foreign key relationships
-    await seedUser();
-    console.log('Users seeded');
-    
-    await seedCustomer();
-    console.log('Customers seeded');
-    
-    await seedsRestaurantOwner();
-    console.log('Restaurant owners seeded');
-    
-    await seedsRestaurant();
-    console.log('Restaurants seeded');
-    
-    await seedDriver();
-    console.log('Drivers seeded');
-    
-    await seedCategory();
-    console.log('Categories seeded');
-    
-    await seedGeolocation();
-    console.log('Geolocations seeded');
-    
-    await seedMenuItem();
-    console.log('Menu items seeded');
-    
-    console.log('All seeds completed successfully!');
-    process.exit(0);
-  } catch (error) {
-    console.error('Error seeding database:', error);
-    process.exit(1);
-  }
-};
 
-seedDatabase();
+// seedUser()
+// seedCustomer()
+// seedsRestaurantOwner()
+// seedsRestaurant()
+// seedDriver()
+seedCategory()
+// seedGeolocation()
+// seedMenuItem()

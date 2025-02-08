@@ -13,12 +13,14 @@ const userRoutes = require("./routes/userRoutes");
 const DriverRouter= require("./routes/driverRoutes.js");
 const messageRoutes = require('./routes/messageRoutes');
 const { Conversation, Message } = require('./database/associations');
+const categoryRoutes = require("./routes/categorieRoutes.js");
 const setupTracking = require('./tracking');
 
 
 
 const app = express();
 const httpServer = createServer(app);
+// const allowedOrigins = ['http://localhost:5174', 'https://your-production-domain.com'];
 // const allowedOrigins = ['http://localhost:5173', 'http://localhost:5181'];
 
 // Update CORS configuration
@@ -109,6 +111,9 @@ app.use('/api/resto', RestoRoter);
 app.use('/api/admin', adminRoutes);
 app.use('/api/driver', DriverRouter);
 app.use('/api/messages', messageRoutes);
+app.use('/api/category', categoryRoutes);
+// ✅ Middleware
+// ✅ CORS Configuration for Cookies
 
 // Setup tracking for driver location updates
 setupTracking(io);
@@ -127,3 +132,13 @@ httpServer.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
 
+// {
+//   origin: function (origin, callback) {
+//     if (allowedOrigins.includes(origin) || !origin) {
+//       callback(null, true); // Allow the request
+//     } else {
+//       callback(new Error('Not allowed by CORS')); // Block the request
+//     }
+//   },
+//   credentials: true, // If you're using cookies or authentication
+// })

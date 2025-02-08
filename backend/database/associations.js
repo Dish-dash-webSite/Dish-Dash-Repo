@@ -1,4 +1,4 @@
-const { DataTypes } = require('sequelize');
+const { DataTypes, Op } = require('sequelize');
 const { connection } = require("./connection");
 
 // Import models
@@ -84,7 +84,7 @@ Conversation.hasMany(Message, { foreignKey: 'conversationId', onDelete: 'CASCADE
 Message.belongsTo(Conversation, { foreignKey: 'conversationId' });
 
 // Sync all models with the database
-// connection.sync({ force: true }).then(() => {
+// connection.sync({ alter: true }).then(() => {
 //   console.log('Database & tables created!');
 // });
 

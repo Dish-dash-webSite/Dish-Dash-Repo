@@ -13,7 +13,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/users" element={<Users />} />
-          <Route path="/*" element={<MainLayout />} />
+          <Route path="/*" element={<MainLayout />} /> {/* MainLayout will show the Dashboard */}
         </Routes>
       </Router>
     </Provider>

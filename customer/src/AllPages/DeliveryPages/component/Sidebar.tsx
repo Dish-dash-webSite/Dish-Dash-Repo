@@ -60,10 +60,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isSidebarOpen, closeSidebar, onMenuIt
                 className="hover:bg-white hover:text-[#FC8A06] p-2 rounded-lg transition-colors duration-300"
                 onClick={() => navigate('/')}
               >
-                <a href="#" className="block">
+                <a href="" className="block">
                   Back to Home
                 </a>
               </li>
+
             </>
           ) : (
             <>

@@ -4,25 +4,29 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const { createServer } = require("http");
 const { Server } = require("socket.io");
+
+// Importing Controllers and Routes
 const SocketController = require("./controllers/socketController");
-const RestoRoter = require("./routes/restaurantRoutes.js")
-const port = 3000;
-const db = require("./database/connection.js");
-const adminRoutes = require("./routes/adminRoutes");
+const RestoRouter = require("./routes/restaurantRoutes.js");
 const userRoutes = require("./routes/userRoutes");
-const DriverRouter= require("./routes/driverRoutes.js");
+const adminRoutes = require("./routes/adminRoutes");
+const DriverRouter = require("./routes/driverRoutes.js");
 const messageRoutes = require('./routes/messageRoutes');
+
+// Importing Database connection and Models
+const db = require("./database/connection.js");
 const { Conversation, Message } = require('./database/associations');
 
-
-
+// Create Express app
 const app = express();
-const httpServer = createServer(app);
-// const allowedOrigins = ['http://localhost:5173', 'http://localhost:5181'];
 
-// Update CORS configuration
+// Set up HTTP server and socket server
+const httpServer = createServer(app);
+
+// Allowed Origins for CORS
 const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5181'];
 
+// CORS configuration
 app.use(cors({
   origin: function (origin, callback) {
     if (allowedOrigins.includes(origin) || !origin) {
@@ -34,7 +38,7 @@ app.use(cors({
   credentials: true
 }));
 
-// Socket.IO setup with CORS
+// Socket.IO setup with CORS configuration
 const io = new Server(httpServer, {
   cors: {
     origin: allowedOrigins,
@@ -46,7 +50,25 @@ const io = new Server(httpServer, {
   pingInterval: 25000
 });
 
-// Simple socket event handlers with console.logs
+// Initialize SocketController
+const socketController = new SocketController(io);
+
+// Socket connection event
+io.on("connection", (socket) => socketController.handleConnection(socket));
+
+// Middleware for Express
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+// API Routes
+app.use('/api/users', userRoutes);
+app.use('/api/resto', RestoRouter);
+app.use('/api/admin', adminRoutes);
+app.use('/api/driver', DriverRouter);
+app.use('/api/messages', messageRoutes);
+
+// Simple socket event handling for conversation and messages
 io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
 
@@ -98,17 +120,6 @@ io.on('connection', (socket) => {
   });
 });
 
-app.use(express.json()); 
-app.use(express.urlencoded({ extended: true })); 
-app.use(cookieParser());
-
-// Use routes
-app.use('/api/users', userRoutes);
-app.use('/api/resto', RestoRoter);
-app.use('/api/admin', adminRoutes);
-app.use('/api/driver', DriverRouter);
-app.use('/api/messages', messageRoutes);
-
 // Error Handling Middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -118,8 +129,8 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start Server
+// Start the server
+const port = 3000;
 httpServer.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
-

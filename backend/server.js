@@ -16,12 +16,15 @@ const messageRoutes = require('./routes/messageRoutes');
 // Importing Database connection and Models
 const db = require("./database/connection.js");
 const { Conversation, Message } = require('./database/associations');
+const categoryRoutes = require("./routes/categorieRoutes.js");
 
 // Create Express app
 const app = express();
 
 // Set up HTTP server and socket server
 const httpServer = createServer(app);
+// const allowedOrigins = ['http://localhost:5174', 'https://your-production-domain.com'];
+// const allowedOrigins = ['http://localhost:5173', 'http://localhost:5181'];
 
 // Allowed Origins for CORS
 const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5181'];
@@ -120,6 +123,20 @@ io.on('connection', (socket) => {
   });
 });
 
+app.use(express.json()); 
+app.use(express.urlencoded({ extended: true })); 
+app.use(cookieParser());
+
+// Use routes
+app.use('/api/users', userRoutes);
+app.use('/api/resto', RestoRoter);
+app.use('/api/admin', adminRoutes);
+app.use('/api/driver', DriverRouter);
+app.use('/api/messages', messageRoutes);
+app.use('/api/category', categoryRoutes);
+// ✅ Middleware
+// ✅ CORS Configuration for Cookies
+
 // Error Handling Middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -134,3 +151,14 @@ const port = 3000;
 httpServer.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
+
+// {
+//   origin: function (origin, callback) {
+//     if (allowedOrigins.includes(origin) || !origin) {
+//       callback(null, true); // Allow the request
+//     } else {
+//       callback(new Error('Not allowed by CORS')); // Block the request
+//     }
+//   },
+//   credentials: true, // If you're using cookies or authentication
+// })

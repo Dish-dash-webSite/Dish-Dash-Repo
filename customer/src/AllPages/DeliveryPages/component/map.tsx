@@ -9,18 +9,17 @@ const containerStyle: React.CSSProperties = {
 const center: google.maps.LatLngLiteral = { lat: 36.812048, lng: 10.138082 };
 
 interface Restaurant {
-  id: number;
-  name: string;
+
   lat: number;
   lng: number;
 }
 
 const fakeRestaurants: Restaurant[] = [
-  { id: 1, name: "La Bella Cucina", lat: 36.814048, lng: 10.138582 },
-  { id: 2, name: "Pasta Paradise", lat: 36.813048, lng: 10.140582 },
-  { id: 3, name: "Sushi Supreme", lat: 36.811048, lng: 10.142582 },
-  { id: 4, name: "Burger Bliss", lat: 36.810048, lng: 10.144582 },
-  { id: 5, name: "Taco Tower", lat: 36.812048, lng: 10.146582 },
+  {lat: 36.814048, lng: 10.138582 },
+  { lat: 36.813048, lng: 10.140582 },
+  { lat: 36.811048, lng: 10.142582 },
+  {lat: 36.810048, lng: 10.144582 },
+  {  lat: 36.812048, lng: 10.146582 },
 ];
 
 interface LiveMapProps {
@@ -74,10 +73,9 @@ const LiveMap: React.FC<LiveMapProps> = ({ onMapLoaded }) => {
       {/* Render restaurant markers dynamically */}
       {fakeRestaurants.map((restaurant) => (
         <Marker
-          key={restaurant.id}
-          position={{ lat: restaurant.lat, lng: restaurant.lng }}
-          title={restaurant.name}
-          onClick={() => alert(`You clicked on ${restaurant.name}`)}
+          position={restaurant}
+          title={"AAAA"}
+          onClick={() => alert(`You clicked on `)}
         />
       ))}
     </GoogleMap>

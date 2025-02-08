@@ -1,19 +1,17 @@
 import React from "react";
 import Dashboard from "./pages/dashboard";
-// import RestaurantForm from "./pages/CreateRestaurant";
 import { Routes, Route } from "react-router-dom";
-// import RestaurantNav from "./pages/navBar";
-import Sidebar from "./pages/sideBar"
-import ProfileCard from "./pages/Profile"
-
+import RestaurantForm from "./pages/CreateRestaurant.tsx"
+import LoginForm from "./pages/login.tsx"
 const RestaurantOwner: React.FC = () => {
     return (
         <Routes>
             <Route path="dashboard" element={<Dashboard />} />
-            {/* <Route path="restaurant" element={<RestaurantForm />} /> */}
-            <Route path="profile" element={<ProfileCard />} />
+            <Route path="create&&immegrate" element={<RestaurantForm />} />
+            <Route path="loginResto" element={<LoginForm />} />
         </Routes>
     );
 };
 
 export default RestaurantOwner;
+

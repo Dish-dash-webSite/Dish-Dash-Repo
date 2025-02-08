@@ -11,7 +11,6 @@ const Delivery: React.FC = () => {
       <Route path="workSpace" element={<WorkSpace />} />
       <Route path="migrate" element={<Migrate />} />
       <Route path="Form" element={<Form />} />
-      
     </Routes>
   );
 };

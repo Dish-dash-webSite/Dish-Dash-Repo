@@ -1,24 +1,9 @@
 "use client";
+import React from 'react';
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { MapPin } from "lucide-react";
-
-interface Restaurant {
-  id: string;
-  name: string;
-  location?: string;
-  image?: string;
-  cuisine?: string;
-  rating?: number;
-}
-
-// Default food images for restaurants without images
-const defaultImages = [
-  "https://images.pexels.com/photos/1639562/pexels-photo-1639562.jpeg", // Burger
-  "https://images.pexels.com/photos/2725744/pexels-photo-2725744.jpeg", // Pizza
-  "https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg", // Pasta
-  "https://images.pexels.com/photos/70497/pexels-photo-70497.jpeg"  // Fries
-];
+import { Restaurant } from "../../../types/index";
 
 const RestaurantList = () => {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
@@ -34,7 +19,7 @@ const RestaurantList = () => {
         // Add default images to restaurants without images
         const restaurantsWithImages = restaurantData.map((restaurant, index) => ({
           ...restaurant,
-          image: restaurant.image || defaultImages[index % defaultImages.length]
+          image: restaurant.image
         }));
 
         // Initially show only restaurants with categories
@@ -56,15 +41,17 @@ const RestaurantList = () => {
   const handleFilterClick = (cuisine: string) => {
     if (activeFilter === cuisine) {
       // If clicking the same filter, show all restaurants with categories
-      setFilteredRestaurants(restaurants.filter(r => r.cuisine));
+      setFilteredRestaurants(restaurants.filter(r => r.cuisineType));
       setActiveFilter(null);
+
     } else {
       // Filter by selected cuisine
       const filtered = restaurants.filter(
-        restaurant => restaurant.cuisine === cuisine
+        restaurant => restaurant.cuisineType === cuisine
       );
       setFilteredRestaurants(filtered);
       setActiveFilter(cuisine);
+
     }
   };
 
@@ -115,10 +102,12 @@ const RestaurantList = () => {
             <div key={restaurant.id} className="bg-white rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition duration-300">
               <div className="relative">
                 <img
-                  src={restaurant.image || defaultImages[index % defaultImages.length]}
-                  alt={restaurant.name}
+                  src={restaurant.image}
+                  alt={restaurant.image}
+                  onError={(e) => {
+                    e.currentTarget.src = 'https://example.com/fallback-image.jpg'; // Fallback image URL
+                  }}
                   className="w-full h-48 object-cover"
-                  onError={handleImageError}
                 />
                 {restaurant.rating && (
                   <div className="absolute top-2 right-2 bg-orange-500 text-white px-2 py-1 rounded-lg text-sm">

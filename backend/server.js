@@ -17,6 +17,7 @@ const messageRoutes = require('./routes/messageRoutes');
 const db = require("./database/connection.js");
 const { Conversation, Message } = require('./database/associations');
 const categoryRoutes = require("./routes/categorieRoutes.js");
+const setupTracking = require('./tracking');
 
 const ownerRestoRoute = require("./routes/restaurantOwner.js")
 
@@ -28,8 +29,8 @@ const httpServer = createServer(app);
 // const allowedOrigins = ['http://localhost:5174', 'https://your-production-domain.com'];
 // const allowedOrigins = ['http://localhost:5173', 'http://localhost:5181'];
 
-// Allowed Origins for CORS
-const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5181'];
+// Update CORS configuration
+const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5181','http://localhost:5175'];
 
 // CORS configuration
 app.use(cors({
@@ -40,7 +41,10 @@ app.use(cors({
       callback(new Error("Not allowed by CORS"));
     }
   },
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Authorization']
 }));
 
 // Socket.IO setup with CORS configuration
@@ -141,6 +145,9 @@ app.use("/api/owner", ownerRestoRoute)
 // app.use('/api/driver', DriverRouter);
 // ✅ Middleware
 // ✅ CORS Configuration for Cookies
+
+// Setup tracking for driver location updates
+setupTracking(io);
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {

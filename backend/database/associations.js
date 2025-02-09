@@ -83,6 +83,9 @@ Conversation.hasMany(Message, { foreignKey: 'conversationId', onDelete: 'CASCADE
 // Message Associations
 Message.belongsTo(Conversation, { foreignKey: 'conversationId' });
 
+// Add User-Media association (inverse relationship)
+User.hasMany(Media, { foreignKey: 'userId', onDelete: 'CASCADE' });
+
 // Sync all models with the database
 // connection.sync({ alter: true }).then(() => {
 //   console.log('Database & tables created!');

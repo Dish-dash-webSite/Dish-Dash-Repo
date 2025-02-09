@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import { useJsApiLoader } from '@react-google-maps/api';
+import { useParams } from 'react-router-dom';
 
 interface DriverLocation {
   lat: number;
@@ -9,54 +10,82 @@ interface DriverLocation {
   orderId: string;
 }
 
-const OrderTracking: React.FC<{ orderId: string }> = ({ orderId }) => {
+const OrderTracking: React.FC = () => {
+  const { orderId } = useParams<{ orderId: string }>(); // Extract orderId from URL
   const [driverLocation, setDriverLocation] = useState<DriverLocation | null>(null);
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
-    googleMapsApiKey: "AIzaSyB5gnUWjb84t6klt5vcPjMOQylhQRFB5Wc"
+    googleMapsApiKey: "AIzaSyB5gnUWjb84t6klt5vcPjMOQylhQRFB5Wc" // Your API key
   });
 
   useEffect(() => {
-    // Connect to socket server
-    const socket = io('http://localhost:3000'); // Update with your socket server URL
+    if (!isLoaded || !orderId) return;
 
-    // Join order tracking room
+    const socket = io('http://localhost:3000');
     socket.emit('join-order-tracking', orderId);
 
-    // Listen for driver location updates
     socket.on('driver-location-update', (location: DriverLocation) => {
       if (location.orderId === orderId) {
-        setDriverLocation(location);
-        updateMap(location);
+        setDriverLocation({
+          ...location,
+          lat: 36.8663, // Ghazala, Ariana, Tunisia latitude
+          lng: 10.1960  // Ghazala, Ariana, Tunisia longitude
+        });
       }
     });
 
     return () => {
       socket.disconnect();
     };
-  }, [orderId]);
+  }, [isLoaded, orderId]);
 
-  const updateMap = (location: DriverLocation) => {
-    if (isLoaded && location) {
-      const map = new window.google.maps.Map(document.getElementById('tracking-map')!, {
-        center: { lat: location.lat, lng: location.lng },
+  useEffect(() => {
+    if (isLoaded && driverLocation) {
+      const mapElement = document.getElementById('tracking-map');
+      if (!mapElement) return;
+
+      const map = new window.google.maps.Map(mapElement, {
+        center: { lat: driverLocation.lat, lng: driverLocation.lng },
         zoom: 15,
+        styles: [
+          {
+            featureType: "road",
+            elementType: "geometry",
+            stylers: [{ color: "#f5f5f5" }]
+          }
+        ]
       });
 
-      // Add/update driver marker
+      // Create a more visible marker for the driver
       new window.google.maps.Marker({
-        position: { lat: location.lat, lng: location.lng },
+        position: { lat: driverLocation.lat, lng: driverLocation.lng },
         map: map,
         icon: {
-          url: '/driver-icon.png', // Add your custom driver icon
-          scaledSize: new window.google.maps.Size(40, 40),
+          path: window.google.maps.SymbolPath.CIRCLE,
+          scale: 10,
+          fillColor: "#FF0000", // Bright red color
+          fillOpacity: 1,
+          strokeColor: "#FFFFFF", // White border
+          strokeWeight: 2,
         },
         title: "Your Driver"
       });
-    }
-  };
 
-  if (!isLoaded) return <div>Loading...</div>;
+      // Add a circle around the driver to make it more visible
+      new window.google.maps.Circle({
+        map: map,
+        center: { lat: driverLocation.lat, lng: driverLocation.lng },
+        radius: 50, // 50 meters radius
+        fillColor: "#FF0000",
+        fillOpacity: 0.2,
+        strokeColor: "#FF0000",
+        strokeOpacity: 0.8,
+        strokeWeight: 1,
+      });
+    }
+  }, [isLoaded, driverLocation]);
+
+  if (!isLoaded) return <div>Loading map...</div>;
 
   return (
     <div className="p-4">
@@ -80,12 +109,12 @@ const OrderTracking: React.FC<{ orderId: string }> = ({ orderId }) => {
 
 // Helper functions
 const calculateDistance = (location: DriverLocation) => {
-  // Implement distance calculation
+  // Implement distance calculation logic here
   return "2.5 km";
 };
 
 const calculateETA = (location: DriverLocation) => {
-  // Implement ETA calculation
+  // Implement ETA calculation logic here
   return "15 minutes";
 };
 

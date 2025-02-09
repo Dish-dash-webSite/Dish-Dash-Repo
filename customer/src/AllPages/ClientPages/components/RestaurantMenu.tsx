@@ -19,6 +19,28 @@ const AppetizerCard: React.FC<AppetizerProps> = ({ id, name, price, imageUrl, de
     }, [])
     const loading = useSelector((state: RootState) => state.restoMenu.loading);
     const dispatch = useAppDispatch();
+    const { token } = useSelector((state: RootState) => state.auth);
+
+    const handleOrderClick = () => {
+        if (!token) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Login Required',
+                text: 'Please login to place an order',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#FC8A06',
+            });
+            return;
+        }
+        
+        dispatch(addItem({ 
+            id: String(id),
+            name, 
+            price, 
+            imageUrl, 
+            description 
+        }));
+    };
 
     if (loading) return <div>Loading Menu...</div>
     return (
@@ -41,13 +63,7 @@ const AppetizerCard: React.FC<AppetizerProps> = ({ id, name, price, imageUrl, de
                     <span className="text-xl font-semibold text-orange-500">{price}</span>
                     <button 
                         className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition" 
-                        onClick={() => dispatch(addItem({ 
-                            id: String(id),
-                            name, 
-                            price, 
-                            imageUrl, 
-                            description 
-                        }))}
+                        onClick={handleOrderClick}
                     >
                         Order now
                     </button>

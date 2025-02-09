@@ -1,116 +1,197 @@
-// import React from 'react';
-// import { useSelector } from "react-redux";
-// import { useEffect } from "react";
-// interface NavbarProps {
-//     toggleSidebar: () => void;
-// }
+import React, { useState } from "react";
+import { FaUtensils, FaUserCircle, FaSignOutAlt, FaEdit, FaKey } from "react-icons/fa"; // Profile, log-out, edit, and change-password icons
+import { Link } from "react-router-dom";
 
-// const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
+const Navbar: React.FC = () => {
+    const [isProfileOpen, setIsProfileOpen] = useState(false); // State to toggle profile sidebar visibility
+    const [isEditing, setIsEditing] = useState(false); // State to toggle editing mode
+    const [userData, setUserData] = useState({
+        name: "John",
+        lastName: "Doe",
+        email: "johndoe@example.com",
+        avatar: "https://www.w3schools.com/w3images/avatar2.png", // Placeholder avatar
+        restaurantName: "John's Diner",
+    });
 
-//     return (
-//         <nav className="fixed top-0 left-0 right-0 bg-white p-4 flex justify-between items-center shadow-lg z-40 overflow-hidden">
-//             {/* Left Side: Toggle Button and Circle */}
-//             <div className="flex items-center space-x-4 relative">
-//                 {/* Circle on the Right of the Menu Button */}
-//                 <div className="w-4 h-4 bg-[#FC8A06] rounded-full opacity-30 absolute left-16 animate-pulse"></div>
-//                 <button
-//                     onClick={toggleSidebar}
-//                     className="p-2 rounded-lg bg-[#FC8A06] hover:bg-[#e67e00] transition-colors duration-300 shadow-md relative z-10"
-//                 >
-//                     <svg
-//                         xmlns="http://www.w3.org/2000/svg"
-//                         className="h-6 w-6 text-white"
-//                         fill="none"
-//                         viewBox="0 0 24 24"
-//                         stroke="currentColor"
-//                     >
-//                         <path
-//                             strokeLinecap="round"
-//                             strokeLinejoin="round"
-//                             strokeWidth={2}
-//                             d="M4 6h16M4 12h16M4 18h16"
-//                         />
-//                     </svg>
-//                 </button>
-//             </div>
+    // Function to toggle profile sidebar visibility
+    const toggleProfileSidebar = () => setIsProfileOpen(!isProfileOpen);
 
-//             {/* Right Side: Circle, Dashboard Title, and Profile Picture */}
-//             <div className="flex items-center space-x-4 relative">
-//                 {/* Circle on the Left of the Dashboard Text */}
-//                 <div className="w-4 h-4 bg-[#028643] rounded-full opacity-30 absolute -left-6 animate-pulse"></div>
-//                 <span className="text-lg font-semibold text-[#03081F]">{"hello"}</span>
-//                 <img
-//                     src="https://cdn.discordapp.com/attachments/1291763293253406832/1291812993738215568/F610CFEB-E0C1-49A7-8AA2-EF016A0E45C2.jpg?ex=67a4f01a&is=67a39e9a&hm=51b137fe9edb55c92b6f3533d299e9eee61c759397300ef8c898327bcba5ce5f&"
-//                     alt="Profile"
-//                     className="rounded-full border-2 border-[#FC8A06] w-[50px] h-[50px] object-cover shadow-md"
-//                 />
-//             </div>
+    // Handle log out logic (placeholder)
+    const handleLogout = () => {
+        // Add logout logic here (e.g., clearing user session, redirecting to login page)
+        console.log("User logged out!");
+    };
 
-//             {/* Animated Lines */}
-//             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-//                 {/* Line from Left Circle */}
-//                 <div
-//                     className="h-[2px] bg-[#FC8A06] absolute top-1/2 left-16 animate-moveLineLeft"
-//                     style={{
-//                         width: 'calc(40% - 4rem)',
-//                         transformOrigin: 'left',
-//                         left: '90px',
-//                         animation: 'moveLineLeft 4s linear infinite',
-//                     }}
-//                 ></div>
-//                 {/* Line from Right Circle */}
-//                 <div
-//                     className="h-[2px] bg-[#028643] absolute top-1/2 right-20 animate-moveLineRight"
-//                     style={{
-//                         width: 'calc(32% - 4rem)',
-//                         transformOrigin: 'right',
-//                         right: '200px',
-//                         animation: 'moveLineRight 4s linear infinite',
-//                     }}
-//                 ></div>
-//             </div>
+    // Handle profile update (can redirect to profile update page)
+    const handleUpdateProfile = () => {
+        // Switch to editing mode
+        setIsEditing(!isEditing);
+        console.log("Navigate to update profile page.");
+    };
 
-//             {/* Custom CSS for Animations */}
-//             <style jsx>{`
-//         @keyframes moveLineLeft {
-//           0% {
-//             transform: scaleX(0);
-//           }
-//           50% {
-//             transform: scaleX(1);
-//           }
-//           100% {
-//             transform: scaleX(0);
-//           }
-//         }
-//         @keyframes moveLineRight {
-//           0% {
-//             transform: scaleX(0);
-//           }
-//           50% {
-//             transform: scaleX(1);
-//           }
-//           100% {
-//             transform: scaleX(0);
-//           }
-//         }
-//         @keyframes pulse {
-//           0% {
-//             opacity: 0.3;
-//           }
-//           50% {
-//             opacity: 0.6;
-//           }
-//           100% {
-//             opacity: 0.3;
-//           }
-//         }
-//         .animate-pulse {
-//           animation: pulse 2s infinite;
-//         }
-//       `}</style>
-//         </nav>
-//     );
-// };
+    // Handle password change logic (placeholder)
+    const handleChangePassword = () => {
+        // Redirect or show password change modal (can be replaced with actual logic)
+        console.log("Navigate to change password page.");
+    };
 
-// export default Navbar;
+    // Handle input change
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setUserData({
+            ...userData,
+            [name]: value,
+        });
+    };
+
+    // Handle save button click (saves edited user data)
+    const handleSaveProfile = () => {
+        setIsEditing(false);
+        console.log("Profile saved:", userData);
+    };
+
+    return (
+        <div>
+            <header className="bg-white shadow-md sticky top-0 z-50">
+                <div className="max-w-7xl mx-auto px-6 sm:px-8 py-4">
+                    <div className="flex items-center justify-between gap-6">
+                        {/* Logo */}
+                        <div className="flex items-center shrink-0">
+                            <FaUtensils className="h-10 w-10 text-black" />
+                            <span className="ml-3 text-2xl font-bold text-black">Order.uk</span>
+                        </div>
+
+                        {/* Navigation Links */}
+                        <nav className="flex space-x-6 items-center">
+                            <Link to="/home" className="text-black hover:text-orange-500 transition-all duration-200">
+                                Home
+                            </Link>
+                            <Link to="/menu/sushi" className="text-black hover:text-orange-500 transition-all duration-200">
+                                Add Product
+                            </Link>
+                            <button onClick={toggleProfileSidebar} className="text-black">
+                                <FaUserCircle className="h-8 w-8 text-black" />
+                            </button>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+
+            {/* Profile Sidebar - Appears from the right side */}
+            <div
+                className={`fixed top-0 right-0 w-80 h-full bg-white z-50 transition-transform transform ${isProfileOpen ? "translate-x-0" : "translate-x-full"} border-l border-black`}
+            >
+                {/* Close and Edit Profile Buttons */}
+                <div className="flex justify-between items-center p-4">
+                    {/* Edit Button */}
+                    <button
+                        onClick={handleUpdateProfile}
+                        className="py-2 px-4 bg-black text-white text-lg font-semibold rounded-full shadow-md hover:bg-orange-500 hover:shadow-lg transition-all flex items-center space-x-2"
+                    >
+                        <FaEdit className="h-5 w-5" />
+                        <span>Edit Profile</span>
+                    </button>
+                    {/* Close Button */}
+                    <button onClick={toggleProfileSidebar} className="text-black text-3xl">
+                        &times;
+                    </button>
+                </div>
+
+                {/* Sidebar Content */}
+                <div className="flex flex-col items-center space-y-6 mt-12">
+                    <img
+                        src={userData.avatar}
+                        alt="User Avatar"
+                        className="h-32 w-32 rounded-full border-4 border-black"
+                    />
+                    <h2 className="text-xl font-bold text-center text-black">
+                        {userData.name} {userData.lastName}
+                    </h2>
+                    <p className="text-sm text-center text-gray-600">{userData.email}</p>
+                    <p className="text-sm text-center text-gray-600">{userData.restaurantName}</p>
+                </div>
+
+                {/* Profile Fields */}
+                {isEditing && (
+                    <div className="space-y-4 w-full px-6 mt-6">
+                        {/* Name and Last Name Input */}
+                        <div className="flex space-x-2">
+                            <input
+                                type="text"
+                                name="name"
+                                value={userData.name}
+                                onChange={handleInputChange}
+                                className="w-full py-2 px-4 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                                placeholder="First Name"
+                            />
+                            <input
+                                type="text"
+                                name="lastName"
+                                value={userData.lastName}
+                                onChange={handleInputChange}
+                                className="w-full py-2 px-4 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                                placeholder="Last Name"
+                            />
+                        </div>
+
+                        {/* Email Input */}
+                        <input
+                            type="email"
+                            name="email"
+                            value={userData.email}
+                            onChange={handleInputChange}
+                            className="w-full py-2 px-4 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                            placeholder="Email"
+                        />
+
+                        {/* Restaurant Name Input */}
+                        <input
+                            type="text"
+                            name="restaurantName"
+                            value={userData.restaurantName}
+                            onChange={handleInputChange}
+                            className="w-full py-2 px-4 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                            placeholder="Restaurant Name"
+                        />
+
+                        {/* Save Changes Button */}
+                        <button
+                            onClick={handleSaveProfile}
+                            className="w-full py-3 bg-black text-white text-lg font-semibold rounded-xl border-2 border-transparent shadow-md hover:bg-orange-500 hover:shadow-lg transition-all"
+                        >
+                            Save Changes
+                        </button>
+                    </div>
+                )}
+
+                {/* Spacer to push buttons to the bottom */}
+                <div className="flex-grow"></div>
+
+                {/* Change Password and Log Out Buttons - Stacked */}
+                {!isEditing && (
+                    <div className="space-y-4 w-full px-6 mb-4">
+                        {/* Change Password Button */}
+                        <button
+                            onClick={handleChangePassword}
+                            className="w-full py-3 bg-white text-black text-lg font-semibold rounded-xl border-2 border-black shadow-md hover:bg-orange-500 hover:text-white transition-all flex items-center justify-center space-x-2"
+                        >
+                            <FaKey className="h-5 w-5" />
+                            <span>Change Password</span>
+                        </button>
+
+                        {/* Log Out Button */}
+                        <button
+                            onClick={handleLogout}
+                            className="w-full py-3 bg-black text-white text-lg font-semibold rounded-xl border-2 border-transparent shadow-md hover:bg-orange-500 hover:shadow-lg transition-all flex items-center justify-center space-x-2"
+                        >
+                            <FaSignOutAlt className="h-5 w-5" />
+                            <span>Log Out</span>
+                        </button>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+export default Navbar;

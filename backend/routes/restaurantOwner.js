@@ -8,6 +8,8 @@ routerRestOwner.post("/create", Restaurent.createItem)
 routerRestOwner.put("/updateItem/:id", Restaurent.updateItem)
 routerRestOwner.delete("/:id", Restaurent.deleteItem)
 routerRestOwner.post("/newcat", Restaurent.addCategory)
-routerRestOwner.get("/allItem/:id", Restaurent.getAllItem)
-
+routerRestOwner.get("/allItem", Restaurent.getallRestoOfOne)
+routerRestOwner.post("/createResto", Restaurent.CreateRestaurant)
+routerRestOwner.post("/loginResto", Restaurent.LoginRestoOwner)
+routerRestOwner.get("/getResto", Restaurent.getRestoOwner)
 module.exports = routerRestOwner

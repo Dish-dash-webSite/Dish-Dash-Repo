@@ -16,7 +16,7 @@ const restaurantOwner = require('./models/restaurantOwner');
 const seedUser = async () => {
   try {
     const users = [
-   
+
       {
         email: 'zeineb@example.com',
         passwordHash: await bcrypt.hash('Test123$', saltRounds),

@@ -26,6 +26,9 @@ const app = express();
 
 // Set up HTTP server and socket server
 const httpServer = createServer(app);
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 // const allowedOrigins = ['http://localhost:5174', 'https://your-production-domain.com'];
 // const allowedOrigins = ['http://localhost:5173', 'http://localhost:5181'];
 
@@ -129,9 +132,7 @@ io.on('connection', (socket) => {
   });
 });
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
+
 
 // Use routes
 app.use('/api/users', userRoutes);

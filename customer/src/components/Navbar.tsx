@@ -1,14 +1,16 @@
 import { Link } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState, AppDispatch } from '../store/index';
+
+import { RootState } from '../store/index';
 import { logoutUser } from '../store/authThunks';
 import { MapPin, ShoppingBag, /*Search, */User, LogOut } from 'lucide-react';
 import ProfileDropdown from '../AllPages/ClientPages/components/ProfileDropdown';
+import { useAppSelector, useAppDispatch } from '../store/index';
 
 
 const Navbar = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const { user } = useSelector((state: RootState) => state.auth);
+  const dispatch = useAppDispatch();
+  const { user } = useAppSelector((state: RootState) => state.auth);
+
 
   const handleLogout = () => {
     dispatch(logoutUser());

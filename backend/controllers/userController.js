@@ -105,6 +105,15 @@ exports.login = [
                 maxAge: 24 * 60 * 60 * 1000, // 24 hours
             });
 
+            // const userData = {
+            //     id: user.id,
+            //     email: user.email,
+            //     role: user.role,
+            //     Customer: user.Customer, // include the nested Customer object
+            //     phoneNumber: user.phoneNumber || '',
+            //     createdAt: user.createdAt,
+            //     updatedAt: user.updatedAt
+            //   };
             // Format user data to match frontend expectations
             const userData = {
                 id: user.id,
@@ -115,13 +124,16 @@ exports.login = [
                 createdAt: user.createdAt,
                 updatedAt: user.updatedAt
             };
+            const customer = await Customer.findOne({ where: { userId: user.id } });
 
             // Send response matching AuthResponse type
             res.json({
                 user: userData,
                 token: token,
+                customer: customer,
                 message: "Login successful"
             });
+
 
         } catch (error) {
             console.error("Login error:", error);

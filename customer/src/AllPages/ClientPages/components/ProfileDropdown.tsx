@@ -14,6 +14,12 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ user, onLogout }) => 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
+  const handleSignOut = () => {
+    onLogout();
+    navigate('/');
+    setIsOpen(false);
+  };
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -115,7 +121,7 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ user, onLogout }) => 
 
         <div className="border-t border-gray-100 p-2">
           <button
-            onClick={onLogout}
+            onClick={handleSignOut}
             className="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
           >
             <LogOut className="h-4 w-4 mr-3" />

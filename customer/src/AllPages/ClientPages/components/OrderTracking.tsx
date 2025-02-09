@@ -26,7 +26,11 @@ const OrderTracking: React.FC = () => {
 
     socket.on('driver-location-update', (location: DriverLocation) => {
       if (location.orderId === orderId) {
-        setDriverLocation(location);
+        setDriverLocation({
+          ...location,
+          lat: 36.8663, // Ghazala, Ariana, Tunisia latitude
+          lng: 10.1960  // Ghazala, Ariana, Tunisia longitude
+        });
       }
     });
 

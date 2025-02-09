@@ -11,6 +11,12 @@ export interface User {
   phoneNumber?: string;
   createdAt: string;
   updatedAt: string;
+  firstName?: string;
+  lastName?: string;
+  deliveryAddress?: string;
+  Media?: {
+    imageUrl: string;
+  }[];
 }
 
 export interface VerifyDriverResponse {
@@ -18,12 +24,12 @@ export interface VerifyDriverResponse {
   isDriver: boolean
 }
 // Used for signing up a new user
-export interface UserSignup {
-  email: string;
-  name: string;
+export interface UserSignup extends Pick<User, 'email'> {
   password: string;
-  role: UserRole;
-  phoneNumber?: string;
+  firstName: string;
+  lastName: string;
+  deliveryAddress: string;
+  role: string;
 }
 
 // Used for logging in an existing user

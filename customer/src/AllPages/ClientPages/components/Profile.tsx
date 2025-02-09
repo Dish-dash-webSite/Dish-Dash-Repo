@@ -1,18 +1,45 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../store';
 import { fetchProfile, updateProfile } from '../../../store/profileThunks';
 import { Camera, Mail, Phone, MapPin, Globe, Save } from 'lucide-react';
 import { RootState } from '../../../store';
 import { useNavigate } from 'react-router-dom';
+import { User } from '../../../types';
+
+// Define a type for the form state
+type FormState = {
+  avatar?: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phoneNumber?: string;
+  deliveryAddress?: string;
+  // Add other fields as necessary
+};
+
+type UserProfile = {
+  // ... existing properties ...
+  Media?: {
+    imageUrl: string;
+  }[];
+};
 
 const Profile: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const profile = useAppSelector((state: RootState) => state.profile.profile);
+  const profile = useAppSelector((state: RootState) => state.profile.profile as User);
   const loading = useAppSelector((state: RootState) => state.profile.loading);
   const error = useAppSelector((state: RootState) => state.profile.error);
 
-  const [formState, setFormState] = useState(profile || {});
+  // Initialize with empty state instead of profile
+  const [formState, setFormState] = useState<FormState>({
+    avatar: '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    phoneNumber: '',
+    deliveryAddress: '',
+  });
   const [isEditing, setIsEditing] = useState(false);
   
   // New state for password update
@@ -22,22 +49,55 @@ const Profile: React.FC = () => {
   const uploadPreset = 'wuvf4swz';
   const cloudName = 'dmpgbk6cz';
 
+  // Add file input reference
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
+    // Force fetch profile when component mounts
     dispatch(fetchProfile());
-  }, [dispatch]);
+  }, []); // Empty dependency array to run only on mount
 
   useEffect(() => {
     if (profile) {
-      setFormState(profile);
+        console.log('Profile data:', profile);
+        setFormState({
+            avatar: profile.Media?.[0]?.imageUrl || '',
+            firstName: profile.firstName || '',
+            lastName: profile.lastName || '',
+            email: profile.email || '',
+            phoneNumber: profile.phoneNumber || '',
+            deliveryAddress: profile.deliveryAddress || '',
+        });
+    } else {
+        // Reset form state when profile is null (user signed out)
+        setFormState({
+            avatar: '',
+            firstName: '',
+            lastName: '',
+            email: '',
+            phoneNumber: '',
+            deliveryAddress: '',
+        });
+        setIsEditing(false);
+        // Clear password fields
+        setOldPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+        // Reset file input
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+        // Redirect to home page
+        navigate('/');
     }
-  }, [profile]);
+  }, [profile, navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    setFormState(prev => prev ? ({
-      ...prev,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
-    }) : null);
+    setFormState(prev => ({
+        ...prev,
+        [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
+    } as FormState));
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,26 +113,40 @@ const Profile: React.FC = () => {
 
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('upload_preset', uploadPreset); // Replace with your Cloudinary upload preset
-
+    formData.append('upload_preset', uploadPreset);
 
     try {
-      const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-        method: 'POST',
-        body: formData,
-      });
+        const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+            method: 'POST',
+            body: formData,
+        });
 
+        const data = await response.json();
+        console.log('Cloudinary response:', data);
 
-      const data = await response.json();
-      if (data.secure_url) {
-        setFormState(prev => prev ? { ...prev, avatar: data.secure_url } : null);
-        alert('Image uploaded successfully!');
-      } else {
-        alert('Failed to upload image.');
-      }
+        if (data.secure_url) {
+            // Update backend first
+            await dispatch(updateProfile({
+                ...formState,
+                avatar: data.secure_url
+            })).unwrap();
+            
+            // Force refresh profile data
+            await dispatch(fetchProfile());
+            
+            // Update local state after backend is updated
+            setFormState(prev => ({
+                ...prev,
+                avatar: data.secure_url
+            }));
+            
+            alert('Image uploaded successfully!');
+        } else {
+            alert('Failed to upload image.');
+        }
     } catch (error) {
-      console.error('Error uploading image:', error);
-      alert('Error uploading image. Please try again.');
+        console.error('Error uploading image:', error);
+        alert('Error uploading image. Please try again.');
     }
   };
 
@@ -80,54 +154,47 @@ const Profile: React.FC = () => {
     e.preventDefault();
 
     try {
-      // Only verify password if user is trying to change it
-      if (oldPassword || newPassword || confirmPassword) {
-        // Verify old password
-        const response = await fetch('http://localhost:3000/api/users/verify-password', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${document.cookie.split('token=')[1]?.split(';')[0] || ''}`
-          },
-          credentials: 'include',
-          body: JSON.stringify({ oldPassword })
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          alert(errorData.message);
-          return;
+        // Validate passwords if they are being updated
+        if (oldPassword || newPassword || confirmPassword) {
+            if (!oldPassword || !newPassword || !confirmPassword) {
+                alert('Please fill in all password fields to update password');
+                return;
+            }
+            if (newPassword !== confirmPassword) {
+                alert('New passwords do not match');
+                return;
+            }
         }
 
-        if (newPassword !== confirmPassword) {
-          alert('New passwords do not match.');
-          return;
-        }
-      }
+        const updateData = {
+            ...formState,
+            oldPassword: oldPassword || undefined,
+            newPassword: newPassword || undefined,
+            confirmPassword: confirmPassword || undefined
+        };
 
-      // Update profile with or without password
-      dispatch(updateProfile({ 
-        ...formState, 
-        password: newPassword || undefined // Only include password if it's being changed
-      }))
-      .unwrap()
-      .then(() => {
-        setIsEditing(false);
-        setOldPassword('');
-        setNewPassword('');
-        setConfirmPassword('');
-        alert('Profile updated successfully!');
-        navigate('/');
-        window.scrollTo(0, 0); // Scroll to the top of the page
-      })
-      .catch(err => {
-        console.error('Failed to update profile:', err);
-        alert('Failed to update profile. Please try again.');
-      });
+        console.log('Password fields:', { oldPassword, newPassword, confirmPassword }); // Debug password fields
+        console.log('Sending update data:', updateData);
+
+        await dispatch(updateProfile(updateData))
+            .unwrap()
+            .then(() => {
+                setIsEditing(false);
+                setOldPassword('');
+                setNewPassword('');
+                setConfirmPassword('');
+                alert('Profile updated successfully!');
+                navigate('/');
+                window.scrollTo(0, 0);
+            })
+            .catch(err => {
+                console.error('Failed to update profile:', err);
+                alert('Failed to update profile. Please try again.');
+            });
 
     } catch (error) {
-      console.error('Error:', error);
-      alert('Failed to update profile. Please try again.');
+        console.error('Error:', error);
+        alert('Failed to update profile. Please try again.');
     }
   };
 
@@ -166,9 +233,12 @@ const Profile: React.FC = () => {
             <div className="flex items-center space-x-6 mb-8">
               <div className="relative">
                 <img
-                  src={formState.avatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"}
+                  src={formState.avatar || '/default-avatar.png'}
                   alt={profile.firstName}
                   className="h-24 w-24 rounded-full object-cover border-4 border-orange-100"
+                  onError={(e) => {
+                    e.currentTarget.src = '/default-avatar.png';
+                  }}
                 />
                 
               </div>
@@ -268,9 +338,10 @@ const Profile: React.FC = () => {
                       <MapPin className="h-5 w-5 text-gray-400" />
                     </div>
                     <input
-                     type="file"
-                     accept="image/*"
-                     onChange={handleImageUpload}
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
                       disabled={!isEditing}
                       className="block w-full pl-10 px-4 py-3 rounded-lg border border-gray-300 focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-50 disabled:text-gray-500"
                     />

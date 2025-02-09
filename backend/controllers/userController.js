@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { User, Customer, RestaurantOwner, Driver } = require("../database/associations");
+const { User, Customer, RestaurantOwner, Driver, Media } = require("../database/associations");
 const { body, validationResult } = require("express-validator");
 
 // Utility function to generate JWT token
@@ -134,35 +134,25 @@ exports.login = [
 exports.getProfile = async (req, res) => {
     const { id } = req.user;
     try {
-        console.log('Fetching profile for user:', id);
         const userData = await User.findOne({
             where: { id },
-            attributes: ['id', 'email', 'role', 'phoneNumber'],
             include: [
                 {
-                    model: Customer,
-                    attributes: ['firstName', 'lastName', 'deliveryAddress'],
+                    model: Media,
+                    attributes: ['imageUrl'],
                     required: false
+                },
+                {
+                    model: Customer,
+                    attributes: ['firstName', 'lastName', 'deliveryAddress']
                 }
             ]
         });
-
-        console.log('Raw user data:', JSON.stringify(userData, null, 2));
-
-        // Flatten the response structure
-        const response = {
-            id: userData.id,
-            email: userData.email,
-            role: userData.role,
-            phoneNumber: userData.phoneNumber,
-            firstName: userData.Customer?.firstName || null,
-            lastName: userData.Customer?.lastName || null,
-            deliveryAddress: userData.Customer?.deliveryAddress || null
-        };
-
-        res.status(200).json(response);
-    } catch (err) {
-        console.log("Error:", err);
+        
+        console.log('User data with media:', userData); // Debug log
+        res.json(userData);
+    } catch (error) {
+        console.error("Error fetching profile:", error);
         res.status(500).json({ error: "Failed to fetch profile" });
     }
 };
@@ -236,66 +226,66 @@ exports.updateProfile = async (req, res) => {
         firstName, 
         lastName, 
         deliveryAddress,
-        password
+        oldPassword,
+        newPassword,
+        avatar 
     } = req.body;
 
     try {
-        // If password is provided, hash it
-        if (password) {
-            const passwordHash = await bcrypt.hash(password, 10);
+        // If password update is requested
+        if (oldPassword && newPassword) {
+            // Verify old password
+            const user = await User.findByPk(id);
+            const isMatch = await bcrypt.compare(oldPassword, user.passwordHash);
+            if (!isMatch) {
+                return res.status(401).json({ error: "Current password is incorrect" });
+            }
+            
+            // Hash new password
+            const passwordHash = await bcrypt.hash(newPassword, 10);
             await User.update(
-                { 
-                    email: email || undefined,
-                    phoneNumber: phoneNumber || undefined,
-                    passwordHash
-                },
+                { email, phoneNumber, passwordHash },
                 { where: { id } }
             );
         } else {
             await User.update(
-                { 
-                    email: email || undefined,
-                    phoneNumber: phoneNumber || undefined
-                },
+                { email, phoneNumber },
                 { where: { id } }
             );
         }
 
-        // Update based on user role
-        switch(req.user.role) {
-            case 'customer':
-                await Customer.update(
-                    { 
-                        firstName: firstName || undefined,
-                        lastName: lastName || undefined,
-                        deliveryAddress: deliveryAddress || undefined
-                    },
-                    { where: { userId: id } }
-                );
-                break;
-            case 'restaurant_owner':
-                await RestaurantOwner.update(
-                    { 
-                        firstName: firstName || undefined,
-                        lastName: lastName || undefined
-                    },
-                    { where: { userId: id } }
-                );
-                break;
-            case 'driver':
-                await Driver.update(
-                    { 
-                        firstName: firstName || undefined,
-                        lastName: lastName || undefined
-                    },
-                    { where: { userId: id } }
-                );
-                break;
+        // Update customer data
+        await Customer.update(
+            { firstName, lastName, deliveryAddress },
+            { where: { userId: id } }
+        );
+
+        // For avatar: Delete old entries and create new one
+        if (avatar) {
+            await Media.destroy({ where: { userId: id } }); // Delete all old avatars
+            await Media.create({  // Create single new avatar
+                userId: id,
+                imageUrl: avatar
+            });
         }
 
-        // Fetch updated data using the getProfile logic
-        return await this.getProfile(req, res);
+        // Get updated profile
+        const userData = await User.findOne({
+            where: { id },
+            include: [
+                {
+                    model: Media,
+                    attributes: ['imageUrl'],
+                    required: false
+                },
+                {
+                    model: Customer,
+                    attributes: ['firstName', 'lastName', 'deliveryAddress']
+                }
+            ]
+        });
 
+        res.json(userData);
     } catch (err) {
         console.error("Update error:", err);
         res.status(500).json({ error: "Failed to update profile" });

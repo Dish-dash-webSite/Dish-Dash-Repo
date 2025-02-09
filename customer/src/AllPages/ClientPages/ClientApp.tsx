@@ -7,7 +7,7 @@ import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer"
 import Profile from "./components/Profile"
 import OrderTracking from "./components/OrderTracking"
-
+import Specialoffers from "./pages/Specialoffers"
 
 const ClientApp: React.FC = () => {
   return (
@@ -19,6 +19,7 @@ const ClientApp: React.FC = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/menulist/:id" element={<MenuList />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/specialoffers" element={<Specialoffers />} />
       <Route path="/order-tracking/:orderId" element={<OrderTracking />} />
       </Routes>
       <Footer />

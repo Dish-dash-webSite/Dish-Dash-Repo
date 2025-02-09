@@ -40,16 +40,19 @@ const Navbar = () => {
           <div className="flex flex-wrap justify-center md:flex space-x-4 md:space-x-8">
             <Link to="/" className="hover:text-orange-500">Home</Link>
             <Link to="/menu" className="hover:text-orange-500">Browse Menu</Link>
-            <Link to="/offers" className="hover:text-orange-500">Special Offers</Link>
+            <Link to="/specialoffers" className="hover:text-orange-500">Special Offers</Link>
             <Link to="/restaurants" className="hover:text-orange-500">Restaurants</Link>
-            <Link to="/track-order" className="hover:text-orange-500">Track Order</Link>
+      
+            <Link to={`/order-tracking/${12345}`} className="hover:text-orange-500">Track Order</Link>
           </div>
+
+
 
           <div className="flex items-center space-x-4">
             <div className="flex items-center">
               <ShoppingBag className="mr-2" />
               <span>0 Items</span>
-              <span className="ml-2">£0.00</span>
+              <span className="ml-2">$0.00</span>
             </div>
             
             {user ? (

@@ -5,12 +5,13 @@ import { logoutUser } from '../store/authThunks';
 import { MapPin, ShoppingBag, /*Search, */User, LogOut } from 'lucide-react';
 import ProfileDropdown from '../AllPages/ClientPages/components/ProfileDropdown';
 import { useAppSelector, useAppDispatch } from '../store/index';
-
+import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state: RootState) => state.auth);
-
+  const { totalItems, totalPrice } = useAppSelector((state: RootState) => state.cart);
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     dispatch(logoutUser());
@@ -52,9 +53,9 @@ const Navbar = () => {
 
           <div className="flex items-center space-x-4">
             <div className="flex items-center">
-              <ShoppingBag className="mr-2" />
-              <span>0 Items</span>
-              <span className="ml-2">$0.00</span>
+              <ShoppingBag className="mr-2" onClick={() => navigate('/cart')} />
+              <span>{totalItems} Items</span>
+              <span className="ml-2">${totalPrice.toFixed(2)}</span>
             </div>
             
             {user ? (

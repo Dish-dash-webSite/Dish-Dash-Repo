@@ -15,6 +15,7 @@ const Media = require('./models/media')(connection, DataTypes);
 const RestaurantOwner = require("./models/restaurantOwner")(connection, DataTypes);
 const Conversation = require('./models/Conversation')(connection, DataTypes);
 const Message = require('./models/Message')(connection, DataTypes);
+const Payment = require('./models/Payment')(connection, DataTypes);
 
 // User Associations
 
@@ -59,6 +60,7 @@ Order.belongsTo(Customer, { foreignKey: 'customerId' });
 Order.belongsTo(Restaurant, { foreignKey: 'restaurantId' });
 Order.belongsTo(Driver, { foreignKey: 'driverId' });
 Order.hasMany(OrderItem, { foreignKey: 'orderId', onDelete: 'CASCADE' });
+Order.hasOne(Payment, { foreignKey: 'orderId', onDelete: 'CASCADE' });
 
 // OrderItem Associations
 OrderItem.belongsTo(Order, { foreignKey: 'orderId' });
@@ -86,6 +88,9 @@ Message.belongsTo(Conversation, { foreignKey: 'conversationId' });
 // Add User-Media association (inverse relationship)
 User.hasMany(Media, { foreignKey: 'userId', onDelete: 'CASCADE' });
 
+// Payment Associations
+Payment.belongsTo(Order, { foreignKey: 'orderId' });
+
 // Sync all models with the database
 // connection.sync({ alter: true }).then(() => {
 //   console.log('Database & tables created!');
@@ -106,5 +111,6 @@ module.exports = {
   RestaurantOwner,
   Conversation,
   Message,
+  Payment,
   connection,
 };

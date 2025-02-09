@@ -9,18 +9,10 @@ module.exports = (sequelize, DataTypes) => {
       customerId: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: {
-          model: 'Customers',
-          key: 'id',
-        },
       },
       restaurantId: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: {
-          model: 'Restaurants',
-          key: 'id',
-        },
       },
       driverId: {
         type: DataTypes.INTEGER,
@@ -35,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       status: {
-        type: DataTypes.ENUM('pending', 'confirmed', 'prepared', 'out_for_delivery', 'delivered'),
+        type: DataTypes.ENUM('pending', 'confirmed', 'preparing', 'ready', 'delivered'),
         defaultValue: 'pending',
       },
       deliveryAddress: {
@@ -43,9 +35,12 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       paymentStatus: {
-        type: DataTypes.ENUM('pending', 'completed', 'failed'),
+        type: DataTypes.ENUM('pending', 'paid', 'failed'),
         defaultValue: 'pending',
       },
+    }, {
+      timestamps: true,
+      paranoid: true
     });
   
     return Order;

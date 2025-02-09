@@ -12,6 +12,8 @@ const userRoutes = require("./routes/userRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const DriverRouter = require("./routes/driverRoutes.js");
 const messageRoutes = require('./routes/messageRoutes');
+const orderRoutes = require('./routes/orderRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
 
 // Importing Database connection and Models
 const db = require("./database/connection.js");
@@ -79,6 +81,8 @@ app.use('/api/resto', RestoRouter);
 app.use('/api/admin', adminRoutes);
 app.use('/api/driver', DriverRouter);
 app.use('/api/messages', messageRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // Simple socket event handling for conversation and messages
 io.on('connection', (socket) => {

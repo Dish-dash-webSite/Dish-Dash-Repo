@@ -8,6 +8,8 @@ import Footer from "../../components/Footer"
 import Profile from "./components/Profile"
 import OrderTracking from "./components/OrderTracking"
 import Specialoffers from "./pages/Specialoffers"
+import Cart from "./components/cart"
+import Payment from "./components/payment"
 
 const ClientApp: React.FC = () => {
   return (
@@ -21,6 +23,8 @@ const ClientApp: React.FC = () => {
         <Route path="/profile" element={<Profile />} />
         <Route path="/specialoffers" element={<Specialoffers />} />
       <Route path="/order-tracking/:orderId" element={<OrderTracking />} />
+      <Route path="/cart" element={<Cart />} />
+      <Route path="/payment" element={<Payment />} />
       </Routes>
       <Footer />
     </div>

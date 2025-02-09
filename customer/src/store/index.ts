@@ -9,6 +9,8 @@ import profileReducer from './profileSlice';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import authRestoSlice from "./authRestoSlice"
 import productsSlice from "./restaurantOwnerSlice"
+import cartReducer from './cartSlice';
+
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -20,6 +22,7 @@ export const store = configureStore({
     profile: profileReducer,
     restoAuth: authRestoSlice,
     restOwner: productsSlice,
+    cart: cartReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(/* any additional middleware if needed */),

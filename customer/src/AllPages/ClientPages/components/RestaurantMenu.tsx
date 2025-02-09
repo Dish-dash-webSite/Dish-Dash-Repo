@@ -1,18 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux'
 import { RootState } from '../../../store'
+import { useAppDispatch } from '../../../store';
+import { addItem } from '../../../store/cartSlice';
+import Swal from 'sweetalert2'
+
 interface AppetizerProps {
+    id: string;
     name: string;
     price: string;
     imageUrl: string;
     description: string;
 }
 
-const AppetizerCard: React.FC<AppetizerProps> = ({ name, price, imageUrl, description }) => {
+const AppetizerCard: React.FC<AppetizerProps> = ({ id, name, price, imageUrl, description }) => {
     useEffect(() => {
         window.scrollTo(0, 0);
     }, [])
     const loading = useSelector((state: RootState) => state.restoMenu.loading);
+    const dispatch = useAppDispatch();
 
     if (loading) return <div>Loading Menu...</div>
     return (
@@ -33,13 +39,21 @@ const AppetizerCard: React.FC<AppetizerProps> = ({ name, price, imageUrl, descri
 
                 <div className="flex justify-between items-center mt-4">
                     <span className="text-xl font-semibold text-orange-500">{price}</span>
-                    <button className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition">
+                    <button 
+                        className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition" 
+                        onClick={() => dispatch(addItem({ 
+                            id: String(id),
+                            name, 
+                            price, 
+                            imageUrl, 
+                            description 
+                        }))}
+                    >
                         Order now
                     </button>
                 </div>
             </div>
         </div>
-
     );
 };
 
@@ -47,8 +61,15 @@ const MenuList: React.FC = () => {
     const menu = useSelector((state: RootState) => state.restoMenu.menu);
     return (
         <div className="p-4">
-            {menu.map((items: any, index: number) => (
-                <AppetizerCard key={index} {...items} />
+            {menu.map((items: any) => (
+                <AppetizerCard 
+                    key={items.id}
+                    id={items.id}
+                    name={items.name}
+                    price={items.price}
+                    imageUrl={items.imageUrl}
+                    description={items.description}
+                />
             ))}
         </div>
     );

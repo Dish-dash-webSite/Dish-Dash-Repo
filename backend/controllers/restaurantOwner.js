@@ -89,16 +89,21 @@ const Restaurent = {
         }
     },
     CreateRestaurant: async (req, res) => {
-        const Token = req.cookies.token
-        console.log("your token", Token)
+        // Clear any existing tokens first
+        res.clearCookie('token');
+        res.clearCookie('RestoToken');
+        
+        const Token = req.cookies.token;
+        console.log("Initial token", Token);
+
         if (!Token) {
             return res.status(401).send("Unauthorized: No token provided");
         }
 
         try {
-            const decodedToken = jwt_decode.jwtDecode(Token) // Decode the token
-            console.log("decodeddd", decodedToken)
-            console.log("decodeddd with id", decodedToken.id)
+            const decodedToken = jwt_decode.jwtDecode(Token);
+            console.log("Decoded token:", decodedToken);
+
             const { firstName, lastName, name, cuisineType, address, contactNumber, openingH, closingH } = req.body;
 
             // Validate required fields
@@ -110,13 +115,13 @@ const Restaurent = {
             const restOwner = await RestaurantOwner.create({
                 firstName,
                 lastName,
-                userId: decodedToken.id, // Use the decoded userId
+                userId: decodedToken.id,
             });
 
-            // Update the user role to 'restaurantOwner'
+            // Update the user role
             await User.update(
                 { role: "restaurantOwner" },
-                { where: { id: decodedToken.id } } // Use the decoded userId to update the correct user
+                { where: { id: decodedToken.id } }
             );
 
             // Create the restaurant
@@ -127,44 +132,57 @@ const Restaurent = {
                 contactNumber,
                 openingH,
                 closingH,
-                restaurantOwnerId: restOwner.id, // Linking to the RestaurantOwner
+                restaurantOwnerId: restOwner.id,
             });
 
-            // Create a JWT token for the restaurant owner
+            // Generate new RestoToken
             const RestoToken = jwt.sign(
-                { restaurantOwnerId: restOwner.id, role: "restaurantOwner" },
+                { 
+                    restaurantOwnerId: restOwner.id, 
+                    role: "restaurantOwner",
+                    userId: decodedToken.id 
+                },
                 "12345",
                 { expiresIn: '7d' }
             );
 
-            // Set the token in the cookie
+            console.log("Generated new RestoToken:", RestoToken);
+
+            // Clear old token and set new RestoToken
+            res.clearCookie('token');
             res.cookie('RestoToken', RestoToken, {
                 httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
                 maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
             });
 
-            // Respond with the created restaurant
-            res.status(200).send(resto);
+            res.status(200).send({
+                success: true,
+                restaurant: resto,
+                token: RestoToken
+            });
         } catch (err) {
-            console.error(err);  // More detailed logging for errors
+            console.error("Error in CreateRestaurant:", err);
             res.status(500).send("An error occurred while creating the restaurant.");
         }
     },
 
     LoginRestoOwner: async (req, res) => {
+        // Clear any existing tokens first
+        res.clearCookie('token');
+        res.clearCookie('RestoToken');
+
         try {
             const { email, password } = req.body;
             console.log('Login attempt - Email:', email);
 
             if (!email || !password) {
-                console.log('Missing email or password');
                 return res.status(400).json({
                     success: false,
                     message: 'Email and password are required'
                 });
             }
 
-            // Find the restaurant owner by email
             const resto = await User.findOne({
                 where: {
                     email,
@@ -172,52 +190,53 @@ const Restaurent = {
                 }
             });
 
-            // Validate if the restaurant owner exists
             if (!resto) {
-                console.log('No restaurant owner found with email:', email);
                 return res.status(401).json({
                     success: false,
                     message: 'Invalid credentials'
                 });
             }
 
-            const validate = await RestaurantOwner.findOne({ where: { userId: resto.id } });
+            const validate = await RestaurantOwner.findOne({ 
+                where: { userId: resto.id } 
+            });
 
             if (!validate) {
-                console.log('No restaurant found for restaurant owner with email:', email);
                 return res.status(401).json({
                     success: false,
                     message: 'Invalid credentials'
                 });
             }
 
-            console.log('Restaurant owner found, verifying password...');
-
-            // Verify password using bcrypt.compare
             const isPasswordValid = await bcrypt.compare(password, resto.passwordHash);
 
             if (!isPasswordValid) {
-                console.log('Password verification failed for:', email);
                 return res.status(401).json({
                     success: false,
                     message: 'Invalid credentials'
                 });
             }
 
-            console.log('Password verification successful, generating token...');
+            // Generate new RestoToken
             const RestoToken = jwt.sign(
-                { restaurantOwnerId: validate.id },  // Changed to use `resto` object
-                "12345",  // Secret key - you should store this securely
+                { 
+                    restaurantOwnerId: validate.id,
+                    role: "restaurantOwner",
+                    userId: resto.id
+                },
+                "12345",
                 { expiresIn: '7d' }
             );
 
-            // Set the token in a cookie
+            console.log("Generated new RestoToken:", RestoToken);
+
+            // Set the new RestoToken
             res.cookie('RestoToken', RestoToken, {
                 httpOnly: true,
-                maxAge: 7 * 24 * 60 * 60 * 1000,  // 7 days
+                secure: process.env.NODE_ENV === 'production',
+                maxAge: 7 * 24 * 60 * 60 * 1000,
             });
 
-            // Respond with a success message and user data
             res.status(200).json({
                 success: true,
                 message: 'Login successful',
@@ -225,16 +244,15 @@ const Restaurent = {
                     id: resto.id,
                     email: resto.email,
                     role: resto.role
-                }
+                },
+                token: RestoToken
             });
         } catch (error) {
             console.error('Login error:', error);
-
-            // Respond with error status and message
             res.status(500).json({
                 success: false,
                 message: 'Internal server error',
-                error: process.env.NODE_ENV === 'development' ? error.message : undefined // Only show error details in development
+                error: process.env.NODE_ENV === 'development' ? error.message : undefined
             });
         }
     },

@@ -13,47 +13,53 @@ const generateToken = (user) => {
 // ✅ Register User
 exports.register = [
     body("email").isEmail().withMessage("Invalid email format"),
-    body("password").isLength({ min: 8 }).withMessage("Password must be at least 8 characters long"),
+    body("password")
+      .isLength({ min: 8 })
+      .withMessage("Password must be at least 8 characters long"),
     body("role").isIn(["customer"]).withMessage("Invalid role"),
     body("firstName").notEmpty().withMessage("First name is required"),
     body("lastName").notEmpty().withMessage("Last name is required"),
-    body("deliveryAddress").notEmpty().withMessage("Delivery address is required"),
-
+    body("deliveryAddress")
+      .notEmpty()
+      .withMessage("Delivery address is required"),
+  
     async (req, res) => {
-        try {
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                return res.status(400).json({ message: "Validation failed", errors: errors.array() });
-            }
-
-            const { email, password, role, phoneNumber, firstName, lastName, deliveryAddress } = req.body;
-
-            // Check if user already exists
-            const existingUser = await User.findOne({ where: { email } });
-            if (existingUser) return res.status(400).json({ message: "User already exists" });
-
-            // 🔥 Fix: Ensure we store `passwordHash` instead of `password`
-            const passwordHash = await bcrypt.hash(password, 10);
-
-            // ✅ Create user with correct password field
-            const user = await User.create({ email, passwordHash, role, phoneNumber });
-
-            // ✅ Create customer entry with linked user ID
-            await Customer.create({
-                id: user.id,
-                firstName,
-                lastName,
-                deliveryAddress,
-                userId: user.id,
-            });
-
-            res.status(201).json({ message: "User registered successfully" });
-        } catch (error) {
-            console.error("Registration error:", error);
-            res.status(500).json({ message: "Internal server error", error });
+      try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+          return res
+            .status(400)
+            .json({ message: "Validation failed", errors: errors.array() });
         }
+  
+        const { email, password, role, phoneNumber, firstName, lastName, deliveryAddress } = req.body;
+  
+        // Check if user already exists
+        const existingUser = await User.findOne({ where: { email } });
+        if (existingUser)
+          return res.status(400).json({ message: "User already exists" });
+  
+        // Hash the password
+        const passwordHash = await bcrypt.hash(password, 10);
+  
+        // Create the User record
+        const user = await User.create({ email, passwordHash, role, phoneNumber });
+  
+        // Create customer entry with linked user ID using the association helper method:
+        await user.createCustomer({
+          firstName,
+          lastName,
+          deliveryAddress,
+        });
+  
+        res.status(201).json({ message: "User registered successfully" });
+      } catch (error) {
+        console.error("Registration error:", error);
+        res.status(500).json({ message: "Internal server error", error });
+      }
     },
-];
+  ];
+  
 
 
 // ✅ Login User

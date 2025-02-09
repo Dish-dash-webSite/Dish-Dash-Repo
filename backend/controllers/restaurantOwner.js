@@ -105,7 +105,7 @@ const Restaurent = {
             console.log("Decoded token:", decodedToken);
 
             const { firstName, lastName, name, cuisineType, address, contactNumber, openingH, closingH } = req.body;
-
+       
             // Validate required fields
             if (!firstName || !lastName || !name || !cuisineType || !address || !contactNumber || !openingH || !closingH) {
                 return res.status(400).send("All fields are required.");
@@ -271,19 +271,19 @@ const Restaurent = {
     }
     ,
     getRestoOwner: async (req, res) => {
-        const Token = req.cookies.RestoToken
-        console.log("tokennnnnnnnnnn", Token)
+
         try {
-            const decoded = jwt.verify(Token, "12345")
-            console.log("hello", decoded)
-            // const result = await Restaurant.findOne({ where: { id: decoded.restoId } })
-            // const Owner = await RestaurantOwner.findOne({ where: { id: result.restaurantOwnerId } })
-            // const user = await User.findOne({ where: { id: Owner.userId } })
-            res.status(200).send(decoded)
+       
+    
+        if (req.user.role!=="restaurantOwner") {
+            return res.status(401).send({ error: "Unauthorized:ur not an owner" });
         }
-        catch (err) {
-            console.log("err", err)
-            res.status(400).send(err)
+   
+        const owner = await User.findOne({where: {id:req.user.id},include:{model:RestaurantOwner,include:[{model:Restaurant}]}})
+     res.send(owner);
+        } catch (err) {
+            console.log("err", err);
+            res.status(400).send({ error: "Invalid or expired token" });
         }
     },
     logOutResto: (req, res) => {

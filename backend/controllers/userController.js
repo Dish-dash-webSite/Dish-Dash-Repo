@@ -231,7 +231,7 @@ exports.logout = (req, res) => {
         expires: new Date(0), // Immediately expires the cookie
         maxAge: 0,
     });
-    res.json({ message: "Logged out successfully" });
+    res.json({message: "Logged out successfully" });
 };
 
 // ✅ Update User (Protected)

@@ -3,12 +3,17 @@ import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '../../../store';
 import { fetchPopularRestaurants } from '../../../store/restaurantThunks';
 import { AppDispatch } from '../../../store';
-
+import { fetchMenu } from "../../../store/RestoThunk"
+import { useNavigate } from 'react-router-dom';
 const PopularRestaurants: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const restaurants = useSelector((state: RootState) => state.restaurants.popularRestaurants);
   const loading = useSelector((state: RootState) => state.restaurants.loading);
-
+  const navigate = useNavigate()
+  const handleMenuItem = (id: string) => {
+    dispatch(fetchMenu(id))
+    navigate(`/menulist/${id}`)
+  }
   useEffect(() => {
     console.log('1. Fetching restaurants...');
     dispatch(fetchPopularRestaurants())
@@ -19,7 +24,6 @@ const PopularRestaurants: React.FC = () => {
         console.error('3. Fetch error:', error);
       });
   }, [dispatch]);
-
   // Log whenever restaurants or loading changes
   useEffect(() => {
     console.log('4. Current restaurants:', restaurants);
@@ -41,6 +45,11 @@ const PopularRestaurants: React.FC = () => {
           {restaurants.map((restaurant) => (
             <div key={restaurant.id} className="bg-white rounded-lg shadow-md overflow-hidden">
               <div className="p-4">
+                <img
+                  src={restaurant.image}
+                  alt={restaurant.image}
+                  className="w-full h-48 object-cover"
+                />
                 <div className="flex justify-between items-start">
                   <h3 className="text-xl font-semibold">{restaurant.name}</h3>
                   <div className="flex items-center">
@@ -54,7 +63,9 @@ const PopularRestaurants: React.FC = () => {
                   <p>Hours: {restaurant.openingH} - {restaurant.closingH}</p>
                   <p>Contact: {restaurant.contactNumber}</p>
                 </div>
-                <button className="mt-4 w-full bg-orange-500 text-white py-2 px-4 rounded-lg hover:bg-orange-600 transition-colors">
+                <button className="mt-4 w-full bg-orange-500 text-white py-2 px-4 rounded-lg hover:bg-orange-600 transition-colors" onClick={() => {
+                  handleMenuItem(restaurant.id)
+                }}>
                   View Menu
                 </button>
               </div>

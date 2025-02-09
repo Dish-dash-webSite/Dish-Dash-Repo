@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import LiveMap from "../component/map";
 import Navbar from "../component/Navbar";
 import Sidebar from "../component/Sidebar";
@@ -6,7 +6,7 @@ import { LoadScript } from "@react-google-maps/api";
 
 const WorkSpace: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isMapLoaded, setIsMapLoaded] = useState<boolean>(false);
 
   const toggleSidebar = (): void => {
     setIsSidebarOpen((prev) => !prev);
@@ -18,18 +18,24 @@ const WorkSpace: React.FC = () => {
 
   const handleMapLoaded = (): void => {
     console.log("Map loaded successfully!");
-    setIsLoading(false); // Stop the loading state when map is loaded
+    setIsMapLoaded(true); // Set map loaded state to true
   };
+
+  useEffect(() => {
+    if (isMapLoaded) {
+      // Perform any additional actions after the map is loaded
+    }
+  }, [isMapLoaded]);
 
   return (
     <div
       style={{
         backgroundColor: "#ffffff",
         minHeight: "100vh",
-        paddingTop: isLoading ? "0" : "80px",
+        paddingTop: isMapLoaded ? "80px" : "0",
       }}
     >
-      {!isLoading && (
+      {isMapLoaded && (
         <>
           <Navbar toggleSidebar={toggleSidebar} />
           <Sidebar
@@ -39,7 +45,10 @@ const WorkSpace: React.FC = () => {
           />
         </>
       )}
-      <LoadScript googleMapsApiKey="AIzaSyB5gnUWjb84t6klt5vcPjMOQylhQRFB5Wc">
+      <LoadScript
+        googleMapsApiKey="AIzaSyB5gnUWjb84t6klt5vcPjMOQylhQRFB5Wc"
+        onLoad={() => console.log("Google Maps script loaded!")}
+      >
         <LiveMap onMapLoaded={handleMapLoaded} />
       </LoadScript>
     </div>

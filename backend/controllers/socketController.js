@@ -1,6 +1,6 @@
 const LocationController = require("./locationController");
 const db = require('../database/associations');
-const { Conversation, Message, Customer, Driver } = db;
+const { Conversation, Message, Customer, Driver ,} = db;
 
 class SocketController {
   constructor(io) {

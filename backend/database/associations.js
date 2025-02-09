@@ -90,6 +90,7 @@ User.hasMany(Media, { foreignKey: 'userId', onDelete: 'CASCADE' });
 
 // Payment Associations
 Payment.belongsTo(Order, { foreignKey: 'orderId' });
+Order.hasOne(Payment, { foreignKey: 'orderId', onDelete: 'CASCADE' });
 
 // Sync all models with the database
 // connection.sync({ alter: true }).then(() => {

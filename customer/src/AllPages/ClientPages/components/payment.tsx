@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Loader2, CreditCard } from 'lucide-react';
 import { RootState } from '../../../store';
 import axios from 'axios';  
-import { createOrder, createPayment, setPaymentStatus } from '../../../store/cartSlice';
+import { createOrder, createPayment, setPaymentStatus, setOrderId } from '../../../store/cartSlice';
 
 const stripePromise = loadStripe('pk_test_51QpoShDsjllDQns0wu4qDGefRuo61uCqb6Hn5Yo9HmMMEPH8sCutR7yzf4sDVeQLPyVTyor00UoecTprhVWvSG3u00CY2xp2MW');
 
@@ -28,8 +28,10 @@ console.log('Items:', items);
     setIsProcessing(true);
 
     try {
-      // First create the order
-      if (!orderId) {
+      let currentOrderId = orderId;
+
+      // First create the order if orderId is not set
+      if (!currentOrderId) {
         // Validate items before creating the order
         const invalidItems = items.filter(item => {
           const itemId = String(item.id);
@@ -56,14 +58,20 @@ console.log('Items:', items);
         if (!createdOrder?.orderId) {
           throw new Error('Failed to create order: No order ID returned');
         }
+        dispatch(setOrderId(createdOrder.orderId));
+        currentOrderId = createdOrder.orderId; // Use the newly created orderId
       }
+
+      console.log(currentOrderId, 'orderId');
 
       // Then create payment intent
       const { clientSecret } = await dispatch(createPayment({
         amount: totalPrice * 100,
         currency: 'usd',
-        orderId: orderId
+        orderId: currentOrderId // Use the currentOrderId
       })).unwrap();
+
+      console.log(clientSecret, 'clientSecret');
 
       // Confirm payment
       const result = await stripe.confirmCardPayment(clientSecret, {
@@ -72,9 +80,7 @@ console.log('Items:', items);
         },
       });
 
-      if (result.error) {
-        throw result.error;
-      }
+      console.log(result, 'result');
 
       if (result.paymentIntent.status === 'succeeded') {
         await axios.post('http://localhost:3000/api/payments/confirm-payment', {

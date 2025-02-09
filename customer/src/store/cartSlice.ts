@@ -116,6 +116,9 @@ const createOrder = createAsyncThunk('cart/createOrder', async (orderData, { dis
 // Create payment thunk
 const createPayment = createAsyncThunk('cart/createPayment', async (paymentData, { dispatch, getState }) => {
   const state = getState() as RootState;
+  if (!paymentData.orderId) {
+    throw new Error('Order ID is required to create payment intent');
+  }
   const response = await axios.post('http://localhost:3000/api/payments/create-payment-intent', {
     amount: paymentData.amount,
     currency: paymentData.currency,

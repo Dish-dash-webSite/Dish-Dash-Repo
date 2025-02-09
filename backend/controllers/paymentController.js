@@ -113,3 +113,24 @@ exports.createPaymentIntent = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.createPaymentRecord = async (req, res) => {
+  const { orderId, paymentIntentId, amount, currency, status } = req.body;
+  try {
+    const payment = await Payment.create({
+      orderId,
+      paymentIntentId,
+      amount,
+      currency,
+      status
+    });
+
+    res.status(201).json({
+      success: true,
+      payment
+    });
+  } catch (error) {
+    console.error('Error creating payment record:', error);
+    res.status(500).json({ error: error.message });
+  }
+};

@@ -6,6 +6,7 @@ const API_URL = "http://localhost:3000/api/users";
 
 axios.defaults.withCredentials = true;
 
+
 // Login user
 export const loginUser = createAsyncThunk(
   "auth/login",

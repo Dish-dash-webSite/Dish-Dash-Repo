@@ -95,7 +95,7 @@ export interface Restaurant {
 }
 
 export interface MenuItem {
-  id: string;
+  id: number;
   restaurantId: string;
   name: string;
   description: string;
@@ -132,4 +132,37 @@ interface DriverLocation {
   lng: number;
   driverId: string;
   orderId: string;
+}
+
+export interface RestoRegistartion {
+  firstName: string;
+  lastName: string;
+  role: UserRole;
+  name: string;
+  contactNumber?: string;
+  cuisineType: string;
+  address: string;
+  openingH: string;
+  closingH: string;
+}
+
+export interface RestoLogin {
+  email: string;
+  password: string;
+}
+export interface Product {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  imageUrl: string;
+}
+
+export interface Items {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  category?: string;
 }

@@ -25,6 +25,7 @@ const Homepage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const fetchCategories = async () => {
       try {
         const response = await axios.get<Category[]>('http://localhost:3000/api/category/categories');

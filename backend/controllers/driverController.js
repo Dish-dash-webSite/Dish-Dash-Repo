@@ -2,6 +2,7 @@ const { connection,User,Order, Driver } = require('../database/associations'); /
 const validator = require('validator')
 const jwt = require('jsonwebtoken');
 
+
 const registerDriver = async (req, res) => {
     const transaction = await connection.transaction(); // Start a transaction
     try {
@@ -116,5 +117,5 @@ const fetchData = async (req, res) => {
         return res.status(500).json({ message: 'Internal server error' });  }
     }
 
-
+// const nea
 module.exports = { registerDriver ,verifyDriver,fetchData};

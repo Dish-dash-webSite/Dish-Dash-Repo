@@ -243,7 +243,47 @@ const seedsRestaurantOwner = async () => {
     console.error('Error seeding products:', error);
   }
 }
+const seedOrders = async () => {
+  try {
+    const orders = [
+      {
+        customerId: 1, // Assuming customer with ID 1 exists
+        restaurantId: 1, // Assuming restaurant with ID 1 exists
+        totalAmount: 25.99,
+        status: 'pending',
+        deliveryAddress: '123 Main St, New York, NY',
+        paymentStatus: 'pending',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        customerId: 2,
+        restaurantId: 2,
+        totalAmount: 45.50,
+        status: 'confirmed',
+        deliveryAddress: '456 Elm St, Los Angeles, CA',
+        paymentStatus: 'completed',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        customerId: 3,
+        restaurantId: 3,
+        totalAmount: 15.75,
+        status: 'out_for_delivery',
+        deliveryAddress: '789 Oak St, Chicago, IL',
+        paymentStatus: 'completed',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ];
 
+    await Order.bulkCreate(orders);
+    console.log('Orders seeded successfully!');
+  } catch (error) {
+    console.error('Error seeding orders:', error);
+  }
+};
 
 // seedUser()
 // seedCustomer()
@@ -253,3 +293,4 @@ const seedsRestaurantOwner = async () => {
 // seedCategory()
 // seedGeolocation()
 // seedMenuItem()
+// seedOrders()

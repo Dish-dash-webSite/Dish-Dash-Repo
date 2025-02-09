@@ -11,7 +11,6 @@ const generateToken = (user) => {
 };
 
 // ✅ Register User
-// ✅ Register User
 exports.register = [
     body("email").isEmail().withMessage("Invalid email format"),
     body("password").isLength({ min: 8 }).withMessage("Password must be at least 8 characters long"),
@@ -72,16 +71,16 @@ exports.login = [
             const { email, password } = req.body;
 
             // Find user with debug logging
-            const user = await User.findOne({ 
+            const user = await User.findOne({
                 where: { email },
                 include: [{
                     model: Customer,
                     attributes: ['firstName', 'lastName', 'deliveryAddress']
                 }]
             });
-            
+
             console.log('Login attempt:', { email, userFound: !!user });
-            
+
             if (!user) {
                 return res.status(400).json({ message: "Invalid credentials" });
             }
@@ -89,7 +88,7 @@ exports.login = [
             // Check password
             const isMatch = await bcrypt.compare(password, user.passwordHash);
             console.log('Password match:', isMatch);
-            
+
             if (!isMatch) {
                 return res.status(400).json({ message: "Invalid credentials" });
             }

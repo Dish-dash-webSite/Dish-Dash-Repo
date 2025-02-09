@@ -1,6 +1,7 @@
 const { User, Restaurant } = require('../database/associations');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const MenuItem = require('../database/models/MenuItem');
 
 const saltRounds = 10;
 
@@ -174,7 +175,6 @@ const adminController = {
             res.status(500).json({ error: error.message });
         }
     },
-
 
 };
 

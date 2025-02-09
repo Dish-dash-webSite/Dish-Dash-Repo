@@ -5,6 +5,8 @@ import driverReducer from "./driverSlice";
 import dashboardReducer from "./dashboardSlice";
 import categoriesReducer from './categoriesSlice';
 import restoMenuReducer from "./RestoSlice"
+import authRestoSlice from "./authRestoSlice"
+import productsSlice from "./restaurantOwnerSlice"
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -13,6 +15,8 @@ export const store = configureStore({
     dashboard: dashboardReducer,
     categories: categoriesReducer,
     restoMenu: restoMenuReducer,
+    restoAuth: authRestoSlice,
+    restOwner: productsSlice,
   },
 });
 

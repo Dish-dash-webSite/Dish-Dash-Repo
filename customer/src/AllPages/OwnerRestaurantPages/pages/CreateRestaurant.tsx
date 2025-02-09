@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Flag from 'react-world-flags'; // Assuming you have a flag component or use an external package
-
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch } from '../../../store';
+import { registerResto } from "../../../store/authThunkcResto"
 const RestaurantForm: React.FC = () => {
+    const navigate = useNavigate();
+    const dispatch = useDispatch<AppDispatch>()
     const [formData, setFormData] = useState({
         name: '',
-        cuisine: '',
+        cuisineType: '',
         address: '',
         contactNumber: '',
         openingTime: '',
@@ -16,7 +20,7 @@ const RestaurantForm: React.FC = () => {
 
     const [formErrors, setFormErrors] = useState({
         name: '',
-        cuisine: '',
+        cuisineType: '',
         address: '',
         contactNumber: '',
         openingTime: '',
@@ -25,7 +29,6 @@ const RestaurantForm: React.FC = () => {
         lastName: '',   // Last Name error state
     });
 
-    const navigate = useNavigate();
 
     // Handle form input changes
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -47,8 +50,8 @@ const RestaurantForm: React.FC = () => {
             valid = false;
         }
 
-        if (!formData.cuisine) {
-            errors.cuisine = 'Cuisine is required';
+        if (!formData.cuisineType) {
+            errors.cuisineType = 'Cuisine is required';
             valid = false;
         }
 
@@ -86,13 +89,35 @@ const RestaurantForm: React.FC = () => {
         return valid;
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setFormErrors({ ...formErrors }); // Reset previous server error
 
-        if (validateForm()) {
-            // Handle successful form submission (e.g., dispatch action, API call, etc.)
-            console.log('Form submitted:', formData);
-            // Redirect or perform actions after form submission
+        if (!validateForm()) {
+            return;
+        }
+
+        try {
+            // Attempt to register the restaurant
+            await dispatch(registerResto({
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                role: "restaurantOwner",
+                name: formData.name,
+                cuisineType: formData.cuisineType,
+                address: formData.address,
+                contactNumber: formData.contactNumber,
+                openingH: formData.openingTime,
+                closingH: formData.closingTime,
+            }));
+            navigate("/restaurant/dashboard"); // Navigate only if successful
+        } catch (err: any) {
+            // Capture server error message and set it to state
+            const errorMessage = err?.message || 'An error occurred, please try again.';
+            setFormErrors(prevErrors => ({
+                ...prevErrors,
+                serverError: errorMessage // Set the error message from server response
+            }));
         }
     };
 
@@ -151,10 +176,10 @@ const RestaurantForm: React.FC = () => {
                             <label htmlFor="cuisine" className="block text-sm font-medium text-gray-700">Cuisine</label>
                             <select
                                 id="cuisine"
-                                name="cuisine"
-                                value={formData.cuisine}
+                                name="cuisineType"
+                                value={formData.cuisineType}
                                 onChange={handleChange}
-                                className={`mt-1 block w-full px-3 py-2 border ${formErrors.cuisine ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm`}
+                                className={`mt-1 block w-full px-3 py-2 border ${formErrors.cuisineType ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm`}
                                 required
                             >
                                 <option value="">Select Cuisine</option>
@@ -166,7 +191,7 @@ const RestaurantForm: React.FC = () => {
                                 <option value="Mediterranean">Mediterranean</option>
                                 {/* Add more cuisines here as needed */}
                             </select>
-                            {formErrors.cuisine && <p className="text-red-500 text-sm">{formErrors.cuisine}</p>}
+                            {formErrors.cuisineType && <p className="text-red-500 text-sm">{formErrors.cuisineType}</p>}
                         </div>
 
                         {/* Address */}

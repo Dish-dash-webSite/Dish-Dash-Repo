@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, User, UtensilsCrossed } from 'lucide-react';
-import axios from 'axios';
+
 import { registerUser, loginUser } from '../../../store/authThunks';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch } from '../../../store';
 
 const Signup: React.FC = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   const [formData, setFormData] = useState({
     email: '',
@@ -23,7 +24,7 @@ const Signup: React.FC = () => {
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    
+
     // Email validation
     if (!formData.email) {
       newErrors.email = 'Email is required';
@@ -41,7 +42,7 @@ const Signup: React.FC = () => {
     // Name validation
     if (!formData.firstName) newErrors.firstName = 'First name is required';
     if (!formData.lastName) newErrors.lastName = 'Last name is required';
-    
+
     // Address validation
     if (!formData.deliveryAddress) newErrors.deliveryAddress = 'Delivery address is required';
 
@@ -104,7 +105,7 @@ const Signup: React.FC = () => {
       // Clear form and redirect
       clearForm();
       navigate('/');
-      
+
     } catch (err: any) {
       console.error('Signup error:', err);
       setApiError(err.message || 'Failed to create account');
@@ -161,9 +162,8 @@ const Signup: React.FC = () => {
                     required
                     value={formData.firstName}
                     onChange={handleChange}
-                    className={`appearance-none relative block w-full px-12 py-3 border ${
-                      errors.firstName ? 'border-red-500' : 'border-gray-300'
-                    } placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm`}
+                    className={`appearance-none relative block w-full px-12 py-3 border ${errors.firstName ? 'border-red-500' : 'border-gray-300'
+                      } placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm`}
                     placeholder="First name"
                   />
                 </div>
@@ -184,9 +184,8 @@ const Signup: React.FC = () => {
                     required
                     value={formData.lastName}
                     onChange={handleChange}
-                    className={`appearance-none relative block w-full px-12 py-3 border ${
-                      errors.lastName ? 'border-red-500' : 'border-gray-300'
-                    } placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm`}
+                    className={`appearance-none relative block w-full px-12 py-3 border ${errors.lastName ? 'border-red-500' : 'border-gray-300'
+                      } placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm`}
                     placeholder="Last name"
                   />
                 </div>
@@ -208,9 +207,8 @@ const Signup: React.FC = () => {
                     required
                     value={formData.email}
                     onChange={handleChange}
-                    className={`appearance-none relative block w-full px-12 py-3 border ${
-                      errors.email ? 'border-red-500' : 'border-gray-300'
-                    } placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm`}
+                    className={`appearance-none relative block w-full px-12 py-3 border ${errors.email ? 'border-red-500' : 'border-gray-300'
+                      } placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm`}
                     placeholder="Email address"
                   />
                 </div>
@@ -228,9 +226,8 @@ const Signup: React.FC = () => {
                     required
                     value={formData.deliveryAddress}
                     onChange={handleChange}
-                    className={`appearance-none relative block w-full px-12 py-3 border ${
-                      errors.deliveryAddress ? 'border-red-500' : 'border-gray-300'
-                    } placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm`}
+                    className={`appearance-none relative block w-full px-12 py-3 border ${errors.deliveryAddress ? 'border-red-500' : 'border-gray-300'
+                      } placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm`}
                     placeholder="Delivery Address"
                   />
                 </div>

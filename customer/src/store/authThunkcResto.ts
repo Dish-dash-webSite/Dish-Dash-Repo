@@ -1,7 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { RestoRegistartion, RestoLogin, AuthResponse } from "../types/index";
-
 // Login user
 export const loginResto = createAsyncThunk(
     "auth/loginResto",
@@ -13,9 +12,9 @@ export const loginResto = createAsyncThunk(
                     'Content-Type': 'application/json',
                 }
             });
-
             console.log('Login response:', response.data);  // Debugging log
-            return response.data;  // Return the successful response data
+            return response.data
+                ;  // Return the successful response data
         } catch (error: any) {  // Fixing the error syntax here
             console.error('Login error:', {
                 status: error?.response?.status,

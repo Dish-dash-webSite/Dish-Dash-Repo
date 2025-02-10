@@ -67,6 +67,8 @@ export interface AuthState {
 export interface AuthResponse {
   user: User;
   token: string;
+  resto: object;
+  MenuItems: Array<null>;
 }
 
 export interface ErrorResponse {

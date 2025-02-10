@@ -5,43 +5,70 @@ const jwt = require("jsonwebtoken");
 const jwt_decode = require("jwt-decode");
 const Restaurent = {
     updateProfile: async (req, res) => {
-        const { name, cuisineType, address, contactNumber, openingH, closingH, rating, firstName, lastName } = req.body;
-        const { id } = req.params;
+        const { name, cuisineType, address, contactNumber, openingH, closingH, rating, firstName, lastName, email, password } = req.body;
 
         try {
-            // Update restaurant info
-            const updatedRestaurant = await Restaurant.update(
-                { name, cuisineType, address, contactNumber, openingH, closingH, rating },
-                { where: { restaurantOwnerId: id } }
-            );
+            // 1. Check if the email is already taken
+            const existingUser = await User.findOne({ where: { email } });
+            if (existingUser && existingUser.id !== req.user.id) {
+                return res.status(400).json({ message: "Email is already taken by another user." });
+            }
 
-            // Update restaurant owner info
-            const updatedOwner = await RestaurantOwner.update(
+            // 2. Update the restaurant owner's name
+            await RestaurantOwner.update(
                 { firstName, lastName },
-                { where: { id } }
+                { where: { id: req.user.id } }
             );
-            const updateduser = await User.update(
-                { email, password },
-                { where: { id } }
-            )
 
-            // Send response with both updates
-            res.status(200).send({
-                restaurant: updatedRestaurant,
-                owner: updatedOwner,
-                user: updateduser
+            // 3. Update the restaurant info
+            await Restaurant.update(
+                { name, cuisineType, address, contactNumber, openingH, closingH, rating },
+                { where: { restaurantOwnerId: req.user.id } }
+            );
 
+            // 4. Update user info (excluding password for now)
+            const updatedUser = await User.update(
+                { email },
+                { where: { id: req.user.id } }
+            );
+
+            // 5. If the password is provided, hash and update it
+            if (password) {
+                const hashedPassword = await bcrypt.hash(password, 10); // Assuming bcrypt is used for password hashing
+                await User.update(
+                    { password: hashedPassword },
+                    { where: { id: req.user.id } }
+                );
+            }
+
+            // Fetch the updated data for response
+            const updatedRestaurantInfo = await Restaurant.findOne({ where: { restaurantOwnerId: req.user.id } });
+            const updatedOwnerInfo = await RestaurantOwner.findOne({ where: { id: req.user.id } });
+
+            // 6. Send the response with updated data
+            res.status(200).json({
+                restaurant: updatedRestaurantInfo,
+                owner: updatedOwnerInfo,
+                user: updatedUser
             });
+
         } catch (err) {
             console.log("Error:", err);
             res.status(500).send({ error: "Failed to update profile" });
         }
     },
+
+
     createItem: async (req, res) => {
-        const { id, name, description, price, imageUrl, isAvailble, category } = req.body
+        const { name, description, price, imageUrl, isAvailble, category } = req.body
+
         try {
-            const item = await MenuItem.create({ restaurantId: id, name, description, price, imageUrl, isAvailble, category })
-            res.status(200).send(item)
+            const resto = await RestaurantOwner.findOne({ where: { id: req.user.id }, include: { model: Restaurant } })
+            if (resto) {
+                const item = await MenuItem.create({ restaurantId: resto.Restaurants[0].id, name, description, price, imageUrl, isAvailble, category })
+                res.status(200).send(item)
+            }
+            return;
         } catch (err) {
             console.log(err)
             res.status(404).send(err)
@@ -94,13 +121,12 @@ const Restaurent = {
         if (!Token) {
             return res.status(401).send("Unauthorized: No token provided");
         }
-
         try {
             const decodedToken = jwt_decode.jwtDecode(Token) // Decode the token
             console.log("decodeddd", decodedToken)
             console.log("decodeddd with id", decodedToken.id)
             const { firstName, lastName, name, cuisineType, address, contactNumber, openingH, closingH } = req.body;
-       
+
             // Validate required fields
             if (!firstName || !lastName || !name || !cuisineType || !address || !contactNumber || !openingH || !closingH) {
                 return res.status(400).send("All fields are required.");
@@ -131,23 +157,22 @@ const Restaurent = {
             });
 
             // Create a JWT token for the restaurant owner
-            const RestoToken = jwt.sign(
+            const token = jwt.sign(
                 { restaurantOwnerId: restOwner.id, role: "restaurantOwner" },
-                "12345",
+                "1234",
                 { expiresIn: '7d' }
             );
 
             // Set the token in the cookie
-            res.cookie('RestoToken', RestoToken, {
+            res.cookie('token', token, {
                 httpOnly: true,
                 maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
             });
-
             // Respond with the created restaurant
             res.status(200).send(resto);
         } catch (err) {
             console.error(err);  // More detailed logging for errors
-            res.status(500).send("An error occurred while creating the restaurant.");
+            res.status(500).send("An error occurred while creating the restaurant.")
         }
     },
 
@@ -169,7 +194,7 @@ const Restaurent = {
                 where: {
                     email,
                     role: 'restaurantOwner'
-                }
+                },
             });
 
             // Validate if the restaurant owner exists
@@ -182,6 +207,7 @@ const Restaurent = {
             }
 
             const validate = await RestaurantOwner.findOne({ where: { userId: resto.id } });
+            const retaurant = await Restaurant.findAll({ where: { restaurantOwnerId: validate.id }, include: [{ model: MenuItem }] })
 
             if (!validate) {
                 console.log('No restaurant found for restaurant owner with email:', email);
@@ -204,33 +230,19 @@ const Restaurent = {
                 });
             }
 
-            console.log('Password verification successful, generating token...');
-            const RestoToken = jwt.sign(
-                { restaurantOwnerId: validate.id },  // Changed to use `resto` object
-                "12345",  // Secret key - you should store this securely
-                { expiresIn: '7d' }
-            );
-
+            console.log('Password verification successful, generating token...', validate);
+            const token = jwt.sign({ id: validate.id, role: validate.role }, process.env.JWT_SECRET, {
+                expiresIn: "24h",
+            })
             // Set the token in a cookie
-            res.cookie('RestoToken', RestoToken, {
+            res.cookie('token', token, {
                 httpOnly: true,
                 maxAge: 7 * 24 * 60 * 60 * 1000,  // 7 days
             });
-
             // Respond with a success message and user data
-            res.status(200).json({
-                success: true,
-                message: 'Login successful',
-                user: {
-                    id: resto.id,
-                    email: resto.email,
-                    role: resto.role
-                }
-            });
+            res.status(200).json({ restaurantOwner: validate, resto: retaurant[0] });
         } catch (error) {
             console.error('Login error:', error);
-
-            // Respond with error status and message
             res.status(500).json({
                 success: false,
                 message: 'Internal server error',
@@ -238,40 +250,70 @@ const Restaurent = {
             });
         }
     },
-    getallRestoOfOne: async (req, res) => {
-        const Token = req.cookies.RestoToken
-        try {
-            const decoded = jwt_decode.jwtDecode(Token)
-            console.log("hello", decoded)
-            const result = await MenuItem.findAll({ where: { restaurantId: decoded.restoId } })
-            res.status(200).send(result)
-        }
-        catch (err) {
-            console.log("err", err)
-            res.status(400).send(err)
-        }
-    }
-    ,
+    // getallRestoOfOne: async (req, res) => {
+    //     const Token = req.cookies.token
+    //     try {
+    //         const decoded = jwt_decode.jwtDecode(Token)
+    //         console.log("hello", decoded)
+    //         const result = await MenuItem.findAll({ where: { restaurantId: decoded.restoId } })
+    //         res.status(200).send(result)
+    //     }
+    //     catch (err) {
+    //         console.log("err", err)
+    //         res.status(400).send(err)
+    //     }
+    // }
+    // ,
     getRestoOwner: async (req, res) => {
-
         try {
-       
-    
-        if (req.user.role!=="restaurantOwner") {
-            return res.status(401).send({ error: "Unauthorized:ur not an owner" });
-        }
-   
-        const owner = await User.findOne({where: {id:req.user.id},include:{model:RestaurantOwner,include:[{model:Restaurant}]}})
-     res.send(owner);
+            console.log("roleeeeeeee", req.user)
+            const userOwner = await RestaurantOwner.findOne({ where: { id: req.user.id } })
+            if (!userOwner) {
+                return res.status(401).send({ error: "Unauthorized:ur not an owner" });
+            }
+            const owner = await RestaurantOwner.findOne({ where: { id: req.user.id }, include: [{ model: Restaurant, include: [{ model: MenuItem }] }] })
+            res.send(owner);
         } catch (err) {
             console.log("err", err);
             res.status(400).send({ error: "Invalid or expired token" });
         }
     },
+    getProfileInfos: async (req, res) => {
+        console.log("resquest cookies", req.user)
+        try {
+            const userOwner = await RestaurantOwner.findOne({ where: { id: req.user.id } })
+            if (!userOwner) {
+                return res.status(401).send({ error: "Unauthorized:ur not an owner" });
+            }
+            const userInfos = await User.findOne({ where: { id: userOwner.userId } })
+            res.status(200).send({ 'user': userInfos })
+        } catch (err) {
+            console.log("err", err)
+            throw err
+        }
+    },
+    getRestoInfo: async (req, res) => {
+        console.log("resquest cookies", req.user)
+        try {
+            const userOwner = await RestaurantOwner.findOne({ where: { id: req.user.id }, include: { model: Restaurant } })
+            if (!userOwner) {
+                return res.status(401).send({ error: "Unauthorized:ur not an owner" });
+            }
+            res.status(200).send({ 'user': userOwner })
+        } catch (err) {
+            console.log("err", err)
+            throw err
+        }
+    },
     logOutResto: (req, res) => {
-        res.clearCookie('token');
+        res.clearCookie("token", "", {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "Strict",
+            expires: new Date(0), // Immediately expires the cookie
+            maxAge: 0,
+        })
         res.send('Logged out successfully');
-    }
-
+    },
 }
 module.exports = Restaurent

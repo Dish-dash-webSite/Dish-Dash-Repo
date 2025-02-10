@@ -69,7 +69,7 @@ const LoginForm: React.FC = () => {
                     title: 'Login Successful',
                     text: 'Welcome back!',
                 }).then(() => {
-                    navigate('/restaurant/dashboard'); // Adjust the route to your desired landing page
+                    navigate('/restaurant/home'); // Adjust the route to your desired landing page
                 });
             }
         } catch (error) {

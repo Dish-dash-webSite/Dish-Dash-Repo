@@ -46,7 +46,7 @@ const WorkSpace: React.FC = () => {
         </>
       )}
       <LoadScript
-        googleMapsApiKey="AIzaSyB5gnUWjb84t6klt5vcPjMOQylhQRFB5Wc"
+        googleMapsApiKey="enter your code here"
         onLoad={() => console.log("Google Maps script loaded!")}
       >
         <LiveMap onMapLoaded={handleMapLoaded} />

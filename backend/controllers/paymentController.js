@@ -1,5 +1,5 @@
 // paymentController.js
-const stripe = require('stripe')('sk_test_51QpoShDsjllDQns0y5GlBwKnJokakJR3Es6YXMwbau5LSgO0eFQlQ4alLPxcFlpDlWRgPrhW2hbubbMo0aeivsqi005ZVtO8fd');
+const stripe = require('stripe')("ge ur code from stripe");
 const { Payment, Order } = require('../database/associations');
 
 exports.createPayment = async (req, res) => {

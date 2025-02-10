@@ -110,7 +110,7 @@ const RestaurantForm: React.FC = () => {
                 openingH: formData.openingTime,
                 closingH: formData.closingTime,
             }));
-            navigate("/restaurant/dashboard"); // Navigate only if successful
+            navigate("/restaurant/loginResto"); // Navigate only if successful
         } catch (err: any) {
             // Capture server error message and set it to state
             const errorMessage = err?.message || 'An error occurred, please try again.';

@@ -132,7 +132,7 @@ const ItemsCard: React.FC<MyObject> = ({ id, name, price, description, imageUrl,
     return (
         <div className="flex flex-col bg-white shadow-lg rounded-lg overflow-hidden mb-4 max-w-2xl w-full mx-auto border-2 border-orange-500 hover:shadow-xl transition-all">
             <img
-                src={formData.imageUrl}  // Use formData imageUrl
+                src="https://images.pexels.com/photos/4440877/pexels-photo-4440877.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" // Use formData imageUrl
                 alt={formData.name}
                 className="w-full h-56 object-cover rounded-t-lg"
             />

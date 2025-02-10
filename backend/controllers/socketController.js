@@ -1,11 +1,13 @@
 const LocationController = require("./locationController");
 const db = require('../database/associations');
 const { Conversation, Message, Customer, Driver ,} = db;
+const { Server } = require("socket.io");
 
 class SocketController {
   constructor(io) {
     this.io = io;
     this.activeUsers = new Map(); // Store socket IDs for users
+    this.activeOrders = new Map(); // Store active orders with phone numbers
   }
 
   handleConnection(socket) {
@@ -140,6 +142,46 @@ class SocketController {
     socket.on("error", (error) => {
       console.error("Socket error:", error);
     });
+
+    socket.on('join-order-tracking', ({ orderId, phoneNumber }) => {
+      // Verify the order belongs to this phone number
+      // This would typically involve checking against your database
+      if (this.verifyOrderPhone(orderId, phoneNumber)) {
+        socket.join(`order_${orderId}_${phoneNumber}`);
+        
+        // Simulate driver updates for testing
+        this.simulateDriverUpdates(orderId, phoneNumber);
+      }
+    });
+  }
+
+  verifyOrderPhone(orderId, phoneNumber) {
+    // In a real application, verify against your database
+    // For testing, always return true
+    return true;
+  }
+
+  simulateDriverUpdates(orderId, phoneNumber) {
+    // Simulate driver movement for testing
+    let lat = 36.8663;
+    let lng = 10.1960;
+
+    const interval = setInterval(() => {
+      // Simulate movement by slightly changing coordinates
+      lat += 0.0001;
+      lng += 0.0001;
+
+      this.io.to(`order_${orderId}_${phoneNumber}`).emit('driver-location-update', {
+        lat,
+        lng,
+        driverId: 'test-driver',
+        orderId,
+        phoneNumber
+      });
+    }, 3000); // Update every 3 seconds
+
+    // Store the interval to clear it later
+    this.activeOrders.set(`${orderId}_${phoneNumber}`, interval);
   }
 }
 

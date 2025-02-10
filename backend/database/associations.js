@@ -87,9 +87,10 @@ Message.belongsTo(Conversation, { foreignKey: 'conversationId' });
 User.hasMany(Media, { foreignKey: 'userId', onDelete: 'CASCADE' });
 
 // Sync all models with the database
-// connection.sync({ alter: true }).then(() => {
+// connection.sync({ force: true }).then(() => {
 //   console.log('Database & tables created!');
 // });
+
 
 
 module.exports = {

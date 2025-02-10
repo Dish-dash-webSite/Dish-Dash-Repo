@@ -293,4 +293,3 @@ const seedOrders = async () => {
 // seedCategory()
 // seedGeolocation()
 // seedMenuItem()
-// seedOrders()

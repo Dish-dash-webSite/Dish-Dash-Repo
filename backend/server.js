@@ -25,7 +25,7 @@ const ownerRestoRoute = require("./routes/restaurantOwner.js")
 const app = express();
 
 // Set up HTTP server and socket server
-const httpServer = createServer(app);
+const server = createServer(app);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -51,13 +51,12 @@ app.use(cors({
 }));
 
 // Socket.IO setup with CORS configuration
-const io = new Server(httpServer, {
+const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: "*",
     methods: ["GET", "POST"],
-    credentials: true,
-    allowedHeaders: ["my-custom-header"],
   },
+  transports: ['websocket'],
   pingTimeout: 60000,
   pingInterval: 25000
 });
@@ -132,8 +131,6 @@ io.on('connection', (socket) => {
   });
 });
 
-
-
 // Use routes
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
@@ -150,6 +147,11 @@ app.use("/api/owner", ownerRestoRoute)
 // Setup tracking for driver location updates
 setupTracking(io);
 
+// Test endpoint
+app.get('/test', (req, res) => {
+  res.json({ message: 'Server is running' });
+});
+
 // Error Handling Middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -160,9 +162,9 @@ app.use((err, req, res, next) => {
 });
 
 // Start the server
-const port = 3000;
-httpServer.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+const PORT = 3001;
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on http://localhost:${PORT}`);
 });
 
 // {

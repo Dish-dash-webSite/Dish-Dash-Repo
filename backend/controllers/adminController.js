@@ -56,7 +56,7 @@ const adminController = {
             const token = jwt.sign(
                 { id: admin.id, role: admin.role },
                 process.env.JWT_SECRET || 'your-secret-key',
-                { expiresIn: '24h' }
+                { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
             );
 
             // Set token in cookie
@@ -64,7 +64,7 @@ const adminController = {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: 'strict',
-                maxAge: 3600000 * 24 * 7
+                maxAge: process.env.maxAge
             });
 
             console.log('Login successful for:', email);
@@ -137,20 +137,22 @@ const adminController = {
             // Generate JWT token
             const token = jwt.sign(
                 { id: admin.id, role: admin.role },
-                "1234",
-                { expiresIn: '7d' }
+                process.env.JWT_SECRET || 'your-secret-key',
+                { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
             );
 
             // Set token in cookie
             res.cookie('adminToken', token, {
                 httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
                 sameSite: 'strict',
-                maxAge: 7 * 24 * 60 * 60 * 1000
+                maxAge: process.env.maxAge
             });
 
             res.status(201).json({
                 success: true,
                 message: 'Admin registered successfully',
+
                 user: {
                     id: admin.id,
                     name: admin.name,

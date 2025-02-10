@@ -3,12 +3,15 @@ const jwt = require("jsonwebtoken");
 const { User, Customer, RestaurantOwner, Driver, Media } = require("../database/associations");
 const { body, validationResult } = require("express-validator");
 
+const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS) || 10;
+
 // Utility function to generate JWT token
 const generateToken = (user) => {
     return jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, {
-        expiresIn: "24h",
+        expiresIn: process.env.JWT_EXPIRES_IN,
     });
 };
+
 
 // ✅ Register User
 exports.register = [
@@ -40,7 +43,7 @@ exports.register = [
           return res.status(400).json({ message: "User already exists" });
   
         // Hash the password
-        const passwordHash = await bcrypt.hash(password, 10);
+        const passwordHash = await bcrypt.hash(password, saltRounds);
   
         // Create the User record
         const user = await User.create({ email, passwordHash, role, phoneNumber });
@@ -59,7 +62,6 @@ exports.register = [
       }
     },
   ];
-  
 
 
 // ✅ Login User
@@ -103,12 +105,15 @@ exports.login = [
             const token = generateToken(user);
 
             // Set HTTP-only cookie
+            const maxAge = parseInt(process.env.COOKIE_MAX_AGE) || 7 * 24 * 60 * 60 * 1000; // Default to 7 days
+
             res.cookie("token", token, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
                 sameSite: "Strict",
-                maxAge: 24 * 60 * 60 * 1000, // 24 hours
+                maxAge: maxAge,
             });
+
 
             // const userData = {
             //     id: user.id,
@@ -259,7 +264,7 @@ exports.updateProfile = async (req, res) => {
             }
             
             // Hash new password
-            const passwordHash = await bcrypt.hash(newPassword, 10);
+            const passwordHash = await bcrypt.hash(newPassword, saltRounds);
             await User.update(
                 { email, phoneNumber, passwordHash },
                 { where: { id } }

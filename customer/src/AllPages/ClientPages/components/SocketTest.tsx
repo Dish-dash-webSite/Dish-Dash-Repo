@@ -55,7 +55,7 @@ const SocketTest: React.FC = () => {
           
           // Send user info after connection
           const userInfo = {
-            userId: role === 'customer' ? 1 : 99999,
+            userId: role === 'customer' ? 1 : 2,
             userType: role
           };
           console.log('Sending user info:', userInfo);

@@ -20,7 +20,7 @@ const Navbar = () => {
   return (
     <>
       {/* Top Banner */}
-      <div className="bg-gray-100 py-2 px-4">
+      {/* <div className="bg-gray-100 py-2 px-4">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-sm">
           <div className="flex items-center mb-2 md:mb-0">
             <span className="text-yellow-400">⭐</span>
@@ -32,7 +32,7 @@ const Navbar = () => {
             <button className="ml-2 text-orange-500 hover:text-orange-600">Change Location</button>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Main Navigation */}
       <nav className="border-b bg-white">
